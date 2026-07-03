@@ -256,33 +256,6 @@ const QUESTIONS = [{
   "answerHints": ["ブートプロセス", "BIOSはコンピュータ"],
   "chap": "第1章 システムアーキテクチャ"
 }, {
-  "id": 55,
-  "source": "模試",
-  "type": "single",
-  "question": "System V init ベースのシステム上の init プロセスのプロセス ID 番号は何ですか？",
-  "choices": [{
-    "label": "B",
-    "text": "0"
-  }, {
-    "label": "C",
-    "text": "1"
-  }, {
-    "label": "D",
-    "text": "再起動するたびに異なります"
-  }, {
-    "label": "E",
-    "text": "現在の実行レベルに設定されます"
-  }],
-  "answer": ["C"],
-  "selectCount": 1,
-  "identifyHint": "System V init ベースのシステム上の init プロセスのプロセス ID 番号",
-  "decisionKey": "",
-  "mnemonic": "",
-  "answerKeys": ["System V init ベース"],
-  "answerTexts": ["1"],
-  "answerHints": ["1"],
-  "chap": "第1章 システムアーキテクチャ"
-}, {
   "id": 56,
   "source": "模試",
   "type": "fill",
@@ -2848,33 +2821,6 @@ const QUESTIONS = [{
   "answerHints": ["chmod 4755"],
   "chap": "第4章 ファイルとプロセスの管理"
 }, {
-  "id": 118,
-  "source": "模試",
-  "type": "single",
-  "question": "nice コマンドを使用してプロセスを開始するときのデフォルトの nice レベルは何ですか？",
-  "choices": [{
-    "label": "B",
-    "text": "0"
-  }, {
-    "label": "C",
-    "text": "10"
-  }, {
-    "label": "D",
-    "text": "15"
-  }, {
-    "label": "E",
-    "text": "20"
-  }],
-  "answer": ["C"],
-  "selectCount": 1,
-  "identifyHint": "nice コマンドを使用してプロセスを開始するときのデフォルトの nice レベル",
-  "decisionKey": "",
-  "mnemonic": "niceのデフォルト＝10。「な(7)…じゃなく素のniceは10」。",
-  "answerKeys": ["nice"],
-  "answerTexts": ["10"],
-  "answerHints": ["10"],
-  "chap": "第4章 ファイルとプロセスの管理"
-}, {
   "id": 119,
   "source": "模試",
   "type": "fill",
@@ -3263,24 +3209,6 @@ const QUESTIONS = [{
   "answerKeys": ["コマンド mount"],
   "answerTexts": ["あるディレクトリの内容を別のディレクトリで利用できるようにする"],
   "answerHints": ["ある"],
-  "chap": "第5章 デバイスとLinuxファイルシステム"
-}, {
-  "id": 90,
-  "source": "模試",
-  "type": "single",
-  "question": "通常のファイルシステムに対して、ファイルシステムが実行することがないことを選択できますか？",
-  "choices": [{
-    "label": "A",
-    "text": "(OCR崩れにより選択肢不明)"
-  }],
-  "answer": ["A"],
-  "selectCount": 1,
-  "identifyHint": "通常のファイルシステムに対して、ファイルシステムが実行することがないこと",
-  "decisionKey": "",
-  "mnemonic": "",
-  "answerKeys": ["通常のファイルシステム"],
-  "answerTexts": ["(OCR崩れにより選択肢不明)"],
-  "answerHints": ["(OCR崩れにより選択肢不明)"],
   "chap": "第5章 デバイスとLinuxファイルシステム"
 }, {
   "id": 91,
@@ -4363,51 +4291,6 @@ const QUESTIONS = [{
   "answerHints": ["GRUB2"],
   "chap": "第2章 Linuxのインストールとパッケージ管理"
 }, {
-  "id": 445,
-  "source": "想定",
-  "type": "single",
-  "question": "共有ライブラリの検索パスを更新するコマンドはどれか。",
-  "choices": [{
-    "label": "B",
-    "text": "ldconfig"
-  }, {
-    "label": "C",
-    "text": "ldd"
-  }, {
-    "label": "D",
-    "text": "libupdate"
-  }],
-  "answer": ["B"],
-  "selectCount": 1,
-  "identifyHint": "共有ライブラリの検索パスを更新する",
-  "decisionKey": "",
-  "mnemonic": "",
-  "answerKeys": ["共有"],
-  "answerTexts": ["ldconfig"],
-  "answerHints": ["ldconfig"],
-  "chap": "第2章 Linuxのインストールとパッケージ管理"
-}, {
-  "id": 478,
-  "source": "想定",
-  "type": "single",
-  "question": "次の中から、dpkgコマンドでインストール済みパッケージの一覧を表示するオプションはどれか。",
-  "choices": [{
-    "label": "C",
-    "text": "-r"
-  }, {
-    "label": "D",
-    "text": "-S"
-  }],
-  "answer": ["B"],
-  "selectCount": 1,
-  "identifyHint": "次の中から、dpkgコマンドでインストール済みパッケージの一覧を表示するオプション",
-  "decisionKey": "",
-  "mnemonic": "",
-  "answerKeys": ["次の中から、dpkg"],
-  "answerTexts": ["B"],
-  "answerHints": ["B"],
-  "chap": "第2章 Linuxのインストールとパッケージ管理"
-}, {
   "id": 100004,
   "source": "想定",
   "type": "single",
@@ -5110,54 +4993,6 @@ const QUESTIONS = [{
   "answerHints": ["apt"],
   "chap": "第2章 Linuxのインストールとパッケージ管理"
 }, {
-  "id": 100014,
-  "source": "想定",
-  "type": "single",
-  "question": "dpkgコマンドでインストール済みパッケージの一覧を表示するオプションはどれか。",
-  "choices": [{
-    "label": "A",
-    "text": "-l"
-  }, {
-    "label": "C",
-    "text": "-i"
-  }, {
-    "label": "D",
-    "text": "-S"
-  }],
-  "answer": ["A"],
-  "selectCount": 1,
-  "identifyHint": "dpkgコマンドでインストール済みパッケージの一覧を表示するオプション",
-  "decisionKey": "",
-  "mnemonic": "",
-  "answerKeys": ["dpkgコマンド"],
-  "answerTexts": ["-l"],
-  "answerHints": ["-l"],
-  "chap": "第2章 Linuxのインストールとパッケージ管理"
-}, {
-  "id": 100015,
-  "source": "想定",
-  "type": "single",
-  "question": "dpkgコマンドでインストール済みパッケージの一覧を表示するオプションはどれか。",
-  "choices": [{
-    "label": "B",
-    "text": "-i"
-  }, {
-    "label": "C",
-    "text": "-l"
-  }, {
-    "label": "D",
-    "text": "-S"
-  }],
-  "answer": ["C"],
-  "selectCount": 1,
-  "identifyHint": "dpkgコマンドでインストール済みパッケージの一覧を表示するオプション",
-  "decisionKey": "",
-  "mnemonic": "",
-  "answerKeys": ["dpkgコマンド"],
-  "answerTexts": ["-l"],
-  "answerHints": ["-l"],
-  "chap": "第2章 Linuxのインストールとパッケージ管理"
-}, {
   "id": 175,
   "source": "想定",
   "type": "single",
@@ -5806,33 +5641,6 @@ const QUESTIONS = [{
   "answerHints": ["-n"],
   "chap": "第3章 GNUとUNIXコマンド"
 }, {
-  "id": 100023,
-  "source": "想定",
-  "type": "single",
-  "question": "sortコマンドで数値順にソートするオプションはどれか。",
-  "choices": [{
-    "label": "A",
-    "text": "-『"
-  }, {
-    "label": "B",
-    "text": "-n"
-  }, {
-    "label": "C",
-    "text": "-k"
-  }, {
-    "label": "D",
-    "text": "-t"
-  }],
-  "answer": ["B"],
-  "selectCount": 1,
-  "identifyHint": "sortコマンドで数値順にソートするオプション",
-  "decisionKey": "",
-  "mnemonic": "",
-  "answerKeys": ["sortコマンドで数値順にソートするオプションはどれか。"],
-  "answerTexts": ["-n"],
-  "answerHints": ["-n"],
-  "chap": "第3章 GNUとUNIXコマンド"
-}, {
   "id": 100024,
   "source": "想定",
   "type": "single",
@@ -5858,30 +5666,6 @@ const QUESTIONS = [{
   "answerKeys": ["ファイルの"],
   "answerTexts": ["cat -n"],
   "answerHints": ["cat -n"],
-  "chap": "第3章 GNUとUNIXコマンド"
-}, {
-  "id": 100025,
-  "source": "想定",
-  "type": "single",
-  "question": "cutコマンドでCSVファイルの第3フィールドを抽出する正しい記述はどれか。 A. cut -d, -f3 file.csv",
-  "choices": [{
-    "label": "B",
-    "text": "cut -d, -c3 file.csv"
-  }, {
-    "label": "C",
-    "text": "cut -c3 file.csv"
-  }, {
-    "label": "D",
-    "text": "cut -d, -p3 file.csv"
-  }],
-  "answer": ["A"],
-  "selectCount": 1,
-  "identifyHint": "cutコマンドでCSVファイルの第3フィールドを抽出",
-  "decisionKey": "",
-  "mnemonic": "",
-  "answerKeys": ["cutコマンドでCSVファイルの第3フィールドを抽出する正しい記述はどれか。 A"],
-  "answerTexts": ["A"],
-  "answerHints": ["A"],
   "chap": "第3章 GNUとUNIXコマンド"
 }, {
   "id": 100026,
@@ -5936,30 +5720,6 @@ const QUESTIONS = [{
   "answerKeys": ["awk"],
   "answerTexts": ["awk '{print $2}' file"],
   "answerHints": ["awk '{print $2"],
-  "chap": "第3章 GNUとUNIXコマンド"
-}, {
-  "id": 100028,
-  "source": "想定",
-  "type": "single",
-  "question": "cutコマンドでCSVファイルの第3フィールドを抽出する正しい記述はどれか。 A. cut -d, -f3 file.csv",
-  "choices": [{
-    "label": "B",
-    "text": "cut パ」 -p3 file.csv"
-  }, {
-    "label": "C",
-    "text": "cut -S | -n3 負e.csv"
-  }, {
-    "label": "D",
-    "text": "cut -C3 fe.csv"
-  }],
-  "answer": ["A"],
-  "selectCount": 1,
-  "identifyHint": "cutコマンドでCSVファイルの第3フィールドを抽出",
-  "decisionKey": "",
-  "mnemonic": "",
-  "answerKeys": ["cutコマンドでCSVファイルの第3フィールドを抽出する正しい記述はどれか。 A"],
-  "answerTexts": ["A"],
-  "answerHints": ["A"],
   "chap": "第3章 GNUとUNIXコマンド"
 }, {
   "id": 100029,
@@ -6095,30 +5855,6 @@ const QUESTIONS = [{
   "answerKeys": ["awk"],
   "answerTexts": ["awk '{print $2}' file"],
   "answerHints": ["awk '{print $2"],
-  "chap": "第3章 GNUとUNIXコマンド"
-}, {
-  "id": 100034,
-  "source": "想定",
-  "type": "single",
-  "question": "sortコマンドで数値順にソートするオプションはどれか。",
-  "choices": [{
-    "label": "B",
-    "text": "t"
-  }, {
-    "label": "C",
-    "text": "-n"
-  }, {
-    "label": "D",
-    "text": "-k"
-  }],
-  "answer": ["C"],
-  "selectCount": 1,
-  "identifyHint": "sortコマンドで数値順にソートするオプション",
-  "decisionKey": "",
-  "mnemonic": "",
-  "answerKeys": ["sortコマンドで数値順にソートするオプションはどれか。"],
-  "answerTexts": ["-n"],
-  "answerHints": ["-n"],
   "chap": "第3章 GNUとUNIXコマンド"
 }, {
   "id": 100035,
@@ -6445,30 +6181,6 @@ const QUESTIONS = [{
   "answerHints": ["cat -n"],
   "chap": "第3章 GNUとUNIXコマンド"
 }, {
-  "id": 248,
-  "source": "想定",
-  "type": "single",
-  "question": "次の中から、cutコマンドでCSVファイルの第3フィールドを抽出する正しい記述はどれか AA. cut -Dp3 file.csv",
-  "choices": [{
-    "label": "B",
-    "text": "cut -c3 file.csv"
-  }, {
-    "label": "C",
-    "text": "cut -S'!-n3 file.csv"
-  }, {
-    "label": "D",
-    "text": "cut -d',' -f3 file.csv"
-  }],
-  "answer": ["D"],
-  "selectCount": 1,
-  "identifyHint": "次の中から、cutコマンドでCSVファイルの第3フィールドを抽出する",
-  "decisionKey": "",
-  "mnemonic": "",
-  "answerKeys": ["次の中から、cut"],
-  "answerTexts": ["cut -d',' -f3 file.csv"],
-  "answerHints": ["cut -d"],
-  "chap": "第3章 GNUとUNIXコマンド"
-}, {
   "id": 250,
   "source": "想定",
   "type": "single",
@@ -6604,54 +6316,6 @@ const QUESTIONS = [{
   "answerHints": ["head -n"],
   "chap": "第3章 GNUとUNIXコマンド"
 }, {
-  "id": 321,
-  "source": "想定",
-  "type": "single",
-  "question": "次の中から、tarコマンドでgzip圧縮されたアーカイブを展開するオプションはどれか。 A. -Tzf",
-  "choices": [{
-    "label": "B",
-    "text": "-xzf"
-  }, {
-    "label": "C",
-    "text": "-czf"
-  }, {
-    "label": "D",
-    "text": "-tzf"
-  }],
-  "answer": ["B"],
-  "selectCount": 1,
-  "identifyHint": "次の中から、tarコマンドでgzip圧縮されたアーカイブを展開する",
-  "decisionKey": "",
-  "mnemonic": "",
-  "answerKeys": ["次の中から、tarコマンドでgzip圧縮されたアーカイブを展開するオプションはどれか。 A"],
-  "answerTexts": ["-xzf"],
-  "answerHints": ["-xzf"],
-  "chap": "第3章 GNUとUNIXコマンド"
-}, {
-  "id": 325,
-  "source": "想定",
-  "type": "single",
-  "question": "sortコマンドで数値順にソートするオプションはどれか。 A.",
-  "choices": [{
-    "label": "B",
-    "text": "-r"
-  }, {
-    "label": "C",
-    "text": "-n"
-  }, {
-    "label": "D",
-    "text": "-K"
-  }],
-  "answer": ["C"],
-  "selectCount": 1,
-  "identifyHint": "sortコマンドで数値順にソートする",
-  "decisionKey": "",
-  "mnemonic": "",
-  "answerKeys": ["sortコマンドで数値順にソートするオプションはどれか。 A"],
-  "answerTexts": ["-n"],
-  "answerHints": ["-n"],
-  "chap": "第3章 GNUとUNIXコマンド"
-}, {
   "id": 336,
   "source": "想定",
   "type": "single",
@@ -6677,30 +6341,6 @@ const QUESTIONS = [{
   "answerKeys": ["次の中から、sedコマンドでファイル内のすべての\""],
   "answerTexts": ["sed 's/old/new/g' file"],
   "answerHints": ["sed 's"],
-  "chap": "第3章 GNUとUNIXコマンド"
-}, {
-  "id": 353,
-  "source": "想定",
-  "type": "single",
-  "question": "sortコマンドで数値順にソートするオプションはどれか。",
-  "choices": [{
-    "label": "B",
-    "text": "-k"
-  }, {
-    "label": "C",
-    "text": "-n"
-  }, {
-    "label": "D",
-    "text": "+"
-  }],
-  "answer": ["C"],
-  "selectCount": 1,
-  "identifyHint": "sortコマンドで数値順にソートするオプション",
-  "decisionKey": "",
-  "mnemonic": "",
-  "answerKeys": ["sortコマンドで数値順にソートするオプションはどれか。"],
-  "answerTexts": ["-n"],
-  "answerHints": ["-n"],
   "chap": "第3章 GNUとUNIXコマンド"
 }, {
   "id": 364,
@@ -6782,30 +6422,6 @@ const QUESTIONS = [{
   "answerKeys": ["sedコマンドでファイル内のすべての'old'を'"],
   "answerTexts": ["sed 's/old/new/g' file"],
   "answerHints": ["sed 's"],
-  "chap": "第3章 GNUとUNIXコマンド"
-}, {
-  "id": 464,
-  "source": "想定",
-  "type": "single",
-  "question": "sortコマンドで数値順にソートするオプションはどれか。",
-  "choices": [{
-    "label": "B",
-    "text": "-n"
-  }, {
-    "label": "C",
-    "text": "-r"
-  }, {
-    "label": "D",
-    "text": "-k"
-  }],
-  "answer": ["B"],
-  "selectCount": 1,
-  "identifyHint": "sortコマンドで数値順にソートするオプション",
-  "decisionKey": "",
-  "mnemonic": "",
-  "answerKeys": ["sortコマンドで数値順にソートするオプションはどれか。"],
-  "answerTexts": ["-n"],
-  "answerHints": ["-n"],
   "chap": "第3章 GNUとUNIXコマンド"
 }, {
   "id": 468,
@@ -6941,27 +6557,6 @@ const QUESTIONS = [{
   "answerKeys": ["findコマンドで/homeディレクトリ配下のすべての.txtファイルを検索する正しい記述はどれか"],
   "answerTexts": ["find /home -name \".txt\""],
   "answerHints": ["find /home -name"],
-  "chap": "第3章 GNUとUNIXコマンド"
-}, {
-  "id": 100041,
-  "source": "想定",
-  "type": "single",
-  "question": "次の中から、grepコマンドで大文字小文字を区別せずに検索するオプションはどれか。",
-  "choices": [{
-    "label": "B",
-    "text": "-c"
-  }, {
-    "label": "D",
-    "text": "-y"
-  }],
-  "answer": ["A"],
-  "selectCount": 1,
-  "identifyHint": "次の中から、grepコマンドで大文字小文字を区別せずに検索するオプション",
-  "decisionKey": "",
-  "mnemonic": "",
-  "answerKeys": ["次の中から、grep"],
-  "answerTexts": ["A"],
-  "answerHints": ["A"],
   "chap": "第3章 GNUとUNIXコマンド"
 }, {
   "id": 100042,
@@ -7178,30 +6773,6 @@ const QUESTIONS = [{
   "answerKeys": ["teeコマンドの機能として適切な"],
   "answerTexts": ["標準入力をファイルと標準出力の両方に書き込む"],
   "answerHints": ["標準入力を"],
-  "chap": "第3章 GNUとUNIXコマンド"
-}, {
-  "id": 204,
-  "source": "想定",
-  "type": "single",
-  "question": "grepコマンドで大文字小文字を区別せずに検索するオプションはどれか。",
-  "choices": [{
-    "label": "B",
-    "text": "-v"
-  }, {
-    "label": "C",
-    "text": "-i"
-  }, {
-    "label": "D",
-    "text": "-c"
-  }],
-  "answer": ["C"],
-  "selectCount": 1,
-  "identifyHint": "grepコマンドで大文字小文字を区別せずに検索するオプション",
-  "decisionKey": "",
-  "mnemonic": "",
-  "answerKeys": ["grepコマンドで"],
-  "answerTexts": ["-i"],
-  "answerHints": ["-i"],
   "chap": "第3章 GNUとUNIXコマンド"
 }, {
   "id": 216,
@@ -9300,6 +8871,40 @@ function App() {
   const badgeCount = Object.values(records).filter(r => r && r.badge).length;
   const wrongList = questions.filter(q => wrongIds[q.id]); // 間違えた問題
 
+  // ── 覚える進捗（セット単位） ──
+  const blockChunks = i => Math.max(1, Math.ceil((sections[i] || []).length / PAGE_SIZE)); // そのブロックのセット数
+  const setDoneCount = i => {
+    // 全問一発正解でクリアしたセット数
+    const p = studyProgress[i] || {};
+    let n = 0;
+    for (let k = 0; k < blockChunks(i); k++) {
+      const m = p[k];
+      if (m && m.length === 0) n++;
+    }
+    return n;
+  };
+  const setDots = i => {
+    // 各セットの状態ドット（● 完了 / ◐ ミス残り / ○ 未着手）
+    const p = studyProgress[i] || {};
+    return Array.from({
+      length: blockChunks(i)
+    }, (_, k) => {
+      const m = p[k];
+      const done = m && m.length === 0,
+        partial = m && m.length > 0;
+      const color = done ? "#34d39e" : partial ? "#f6c247" : "#5b6878";
+      return /*#__PURE__*/React.createElement("span", {
+        key: k,
+        "aria-hidden": "true",
+        style: {
+          fontSize: 14,
+          lineHeight: 1,
+          color
+        }
+      }, done ? "●" : partial ? "◐" : "○");
+    });
+  };
+
   // ── スタイル（暗記特化: 落ち着いた濃紺、最小限のグロー） ──
   const wrap = {
     minHeight: "100vh",
@@ -10256,6 +9861,7 @@ function App() {
       const isLast = studyChunk + 1 >= chunkCount;
       const perfect = s.total > 0 && s.correct === s.total;
       const misses = (studyProgress[secIdx] || {})[studyChunk] || []; // この回で一発正解できなかった問題ID
+      const remaining = chunkCount - (studyChunk + 1); // このブロックで残っているセット数
       return /*#__PURE__*/React.createElement("div", {
         style: wrap
       }, styleTag, /*#__PURE__*/React.createElement("div", {
@@ -10271,7 +9877,7 @@ function App() {
           letterSpacing: 3,
           opacity: 0.6
         }
-      }, sectionLabels[secIdx], " \u30FB \u7B2C", studyChunk + 1, "\u30BB\u30C3\u30C8"), /*#__PURE__*/React.createElement("div", {
+      }, sectionLabels[secIdx], " \u30FB \u30BB\u30C3\u30C8 ", studyChunk + 1, " / ", chunkCount), /*#__PURE__*/React.createElement("div", {
         style: {
           fontSize: 54,
           fontWeight: 900,
@@ -10291,24 +9897,59 @@ function App() {
         }
       }, perfect ? "全問正解 ✓" : "正解"), /*#__PURE__*/React.createElement("div", {
         style: {
+          marginTop: 20,
+          padding: "12px 14px",
+          borderRadius: 12,
+          background: "#141b26",
+          border: "1px solid #232d3b"
+        }
+      }, /*#__PURE__*/React.createElement("div", {
+        style: {
+          fontSize: 12.5,
+          fontWeight: 800,
+          color: "#c2cad8"
+        }
+      }, sectionLabels[secIdx], "\uFF1A", /*#__PURE__*/React.createElement("span", {
+        style: {
+          color: "#34d39e"
+        }
+      }, setDoneCount(secIdx)), " / ", chunkCount, " \u30BB\u30C3\u30C8\u5B8C\u4E86"), /*#__PURE__*/React.createElement("div", {
+        style: {
+          display: "flex",
+          justifyContent: "center",
+          gap: 6,
+          marginTop: 8
+        }
+      }, setDots(secIdx))), /*#__PURE__*/React.createElement("div", {
+        style: {
           display: "flex",
           flexDirection: "column",
           gap: 10,
-          marginTop: 26
+          marginTop: 22
         }
       }, misses.length > 0 && /*#__PURE__*/React.createElement("button", {
         onClick: startChunkMisses,
         style: primaryBtn("linear-gradient(90deg,#e0a830,#f6c247)")
-      }, "\uD83D\uDD01 \u30DF\u30B9\u306B\u6311\u6226\uFF08", misses.length, "\u554F\uFF09"), !isLast ? /*#__PURE__*/React.createElement("button", {
+      }, "\uD83D\uDD01 \u30DF\u30B9\u306B\u6311\u6226\uFF08", misses.length, "\u554F\uFF09"), !isLast ?
+      /*#__PURE__*/
+      /* 前進導線は常に目立つ primary。残りセット数を明示して“終わった誤解”を防ぐ */
+      React.createElement("button", {
         onClick: () => {
           setStudyChunk(c => c + 1);
           setStudySub("learn");
         },
-        style: misses.length > 0 ? ghostBtn : primaryBtn("linear-gradient(90deg,#5b9bff,#34d39e)")
-      }, "\u6B21\u306E10\u554F\u3092\u899A\u3048\u308B \u2192") : /*#__PURE__*/React.createElement("button", {
+        style: primaryBtn("linear-gradient(90deg,#5b9bff,#34d39e)")
+      }, "\u6B21\u306E\u30BB\u30C3\u30C8\u3078\uFF08\u6B8B\u308A", remaining, "\uFF09\u2192") : /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+        style: {
+          fontSize: 13.5,
+          fontWeight: 800,
+          color: "#8ef0cf",
+          marginTop: 2
+        }
+      }, "\uD83C\uDF89 \u6700\u5F8C\u306E\u30BB\u30C3\u30C8\uFF01\u4ED5\u4E0A\u3052\u306B\u30D6\u30ED\u30C3\u30AF\u30C6\u30B9\u30C8\u3067\u529B\u8A66\u3057"), /*#__PURE__*/React.createElement("button", {
         onClick: () => startTest(secIdx),
-        style: misses.length > 0 ? ghostBtn : primaryBtn("linear-gradient(90deg,#34d39e,#8ef0cf)")
-      }, "\u26A1 \u30D6\u30ED\u30C3\u30AF\u30C6\u30B9\u30C8\uFF08", secQuestions.length, "\u554F\uFF09"), /*#__PURE__*/React.createElement("button", {
+        style: primaryBtn("linear-gradient(90deg,#34d39e,#8ef0cf)")
+      }, "\u26A1 \u30D6\u30ED\u30C3\u30AF\u30C6\u30B9\u30C8\uFF08", secQuestions.length, "\u554F\uFF09")), /*#__PURE__*/React.createElement("button", {
         onClick: () => setStudySub("learn"),
         style: ghostBtn
       }, "\u899A\u3048\u308B\u753B\u9762\u306B\u623B\u308B"), /*#__PURE__*/React.createElement("button", {
@@ -10378,6 +10019,49 @@ function App() {
       },
       "aria-hidden": "true"
     })), /*#__PURE__*/React.createElement("div", {
+      style: {
+        marginTop: 14
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        display: "flex",
+        alignItems: "baseline",
+        justifyContent: "space-between",
+        marginBottom: 6
+      }
+    }, /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontSize: 13,
+        fontWeight: 800,
+        color: "#c2cad8"
+      }
+    }, "\u899A\u3048\u308B \u30FB \u30BB\u30C3\u30C8 ", studyChunk + 1, " ", /*#__PURE__*/React.createElement("span", {
+      style: {
+        color: "#5b6878",
+        fontWeight: 700
+      }
+    }, "/ ", chunkCount)), /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontSize: 11,
+        fontWeight: 700,
+        color: "#5b7088"
+      }
+    }, "\u5B8C\u4E86 ", setDoneCount(secIdx), " / ", chunkCount)), /*#__PURE__*/React.createElement("div", {
+      style: {
+        height: 6,
+        borderRadius: 999,
+        background: "#1b2330",
+        overflow: "hidden"
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        height: "100%",
+        width: `${Math.round(setDoneCount(secIdx) / chunkCount * 100)}%`,
+        background: "linear-gradient(90deg,#34d39e,#8ef0cf)",
+        borderRadius: 999,
+        transition: "width .25s"
+      }
+    }))), /*#__PURE__*/React.createElement("div", {
       style: {
         display: "inline-flex",
         gap: 4,
