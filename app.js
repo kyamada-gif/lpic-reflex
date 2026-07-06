@@ -8586,6 +8586,12 @@ function Highlight({
 // ════════════════════════════════════════════════════════════════
 const PAGE_SIZE = 10; // 覚える画面の1ページ表示数
 const PASS_PCT = 90; // バッジ獲得ライン（正答率%）
+// 総合テスト（模試）: 全範囲から EXAM_SIZE 問。EXAM_PASS 以上で合格＝修了バッジ(銀)、EXAM_GOLD 以上で金バッジ。
+const EXAM_SIZE = 60; // 出題数
+const EXAM_PASS = 42; // 合格ライン（7割）
+const EXAM_GOLD = 50; // 金バッジライン（豪華演出）
+const EXAM_SLOTS = 5; // 修了バッジのコレクション枠
+const RANDOM_BLOCK_N = 20; // ランダム演習（復習用）: 選んだブロックからランダム出題する固定数
 // 8ブロックの問数（章順フラット319問を先頭から区切る）。奇数=イベント50 / 偶数=自習30,29。
 const BLOCK_SIZES = [50, 30, 50, 30, 50, 30, 50, 29];
 
@@ -8812,6 +8818,21 @@ function App() {
     } catch (e) {}
   }, [records]);
 
+  // 総合テスト（模試）の修了バッジ。"silver"(42〜49) / "gold"(50〜) を最大 EXAM_SLOTS 枠まで貯める。localStorageで永続化。
+  const [examSlots, setExamSlots] = useState(() => {
+    try {
+      const v = JSON.parse(localStorage.getItem("reflex-exam") || "[]");
+      return Array.isArray(v) ? v.slice(0, EXAM_SLOTS) : [];
+    } catch {
+      return [];
+    }
+  });
+  useEffect(() => {
+    try {
+      localStorage.setItem("reflex-exam", JSON.stringify(examSlots));
+    } catch (e) {}
+  }, [examSlots]);
+
   // 間違えた問題（id→true）。テストで誤答→追加、正解→除去。localStorageで永続化。
   const [wrongIds, setWrongIds] = useState(() => {
     try {
@@ -8862,8 +8883,6 @@ function App() {
   // ランダム出題モード
   const [randomLabel, setRandomLabel] = useState(""); // 実行中のスコープ表示名（"総合" or "ブロックN"）
   const [lastRandom, setLastRandom] = useState(null); // 再実行用 {scopeIdx, count}
-  const [pickScope, setPickScope] = useState(-1); // randompick: -1=総合 / 0〜7=ブロック
-  const [pickCount, setPickCount] = useState(50); // randompick: 出題数
 
   const secQuestions = sections[secIdx] || [];
   const chunkCount = Math.max(1, Math.ceil(secQuestions.length / PAGE_SIZE));
@@ -8904,6 +8923,38 @@ function App() {
       }, done ? "●" : partial ? "◐" : "○");
     });
   };
+
+  // ── 総合テストの修了バッジ表示 ──
+  const examGoldCount = examSlots.filter(s => s === "gold").length;
+  const examComplete = examSlots.length >= EXAM_SLOTS; // 5枠コンプ
+  const examMastered = examComplete && examGoldCount >= EXAM_SLOTS; // 全枠金＝完全制覇
+  // 5枠のコレクション帯（🥇金 / 🏅銀 / 空）。size でアイコンの大きさを変える。
+  const examStrip = (size = 26) => /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      justifyContent: "center",
+      gap: 6
+    }
+  }, Array.from({
+    length: EXAM_SLOTS
+  }, (_, k) => {
+    const t = examSlots[k];
+    return /*#__PURE__*/React.createElement("span", {
+      key: k,
+      "aria-hidden": "true",
+      style: {
+        width: size + 8,
+        height: size + 8,
+        borderRadius: 9,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontSize: size,
+        background: t === "gold" ? "#2a220e" : t === "silver" ? "#182430" : "#141b26",
+        border: `1px solid ${t === "gold" ? "#e0a83088" : t === "silver" ? "#34d39e55" : "#232d3b"}`
+      }
+    }, t === "gold" ? "🥇" : t === "silver" ? "🏅" : "");
+  }));
 
   // ── スタイル（暗記特化: 落ち着いた濃紺、最小限のグロー） ──
   const wrap = {
@@ -8976,11 +9027,9 @@ function App() {
   } // 間違えた問題に挑戦
 
   // ── ランダム出題 ──
-  const poolOf = scope => scope >= 0 ? sections[scope] || [] : questions; // -1=総合(全319) / 0〜7=ブロック
-  function openRandomPick(scope = -1) {
-    const size = poolOf(scope).length;
-    setPickScope(scope);
-    setPickCount(Math.min(scope >= 0 ? 30 : 50, size)); // 既定: ブロック30 / 総合50
+  const poolOf = scope => scope >= 0 ? sections[scope] || [] : questions; // 0〜7=ブロック
+  // ランダム演習（復習用）: ブロックを選ぶだけの画面。ブロックをタップ＝RANDOM_BLOCK_N 問で即開始。
+  function openBlockRandom() {
     setScreen("randompick");
   }
   function startRandom(scopeIdx, count) {
@@ -8994,6 +9043,18 @@ function App() {
     });
     setFullBlock(false); // 🏅対象外（純粋な演習）
     beginRun(queue, "random");
+  }
+  // 直近ランダム演習で間違えた問題だけを再出題（結果はまた random 扱いなので連鎖する）。
+  function startRandomMisses(missed) {
+    if (missed && missed.length) beginRun(shuffle(missed), "random");
+  }
+
+  // ── 総合テスト（模試）: 全範囲から EXAM_SIZE 問をランダム出題 ──
+  function startExam() {
+    const queue = shuffle(questions).slice(0, Math.min(EXAM_SIZE, questions.length));
+    if (queue.length === 0) return;
+    setFullBlock(false);
+    beginRun(queue, "exam");
   }
   function submitAnswer(input) {
     const q = testQueue[testPos];
@@ -9060,6 +9121,32 @@ function App() {
           full: fullBlock
         });
         setScreen("result");
+      } else if (testMode === "exam") {
+        // 総合テスト（模試）: 合否＋修了バッジ
+        const pass = correct >= EXAM_PASS;
+        const gold = correct >= EXAM_GOLD;
+        const tier = gold ? "gold" : "silver";
+        if (pass) {
+          // 空き枠があれば埋める。満杯かつ金なら銀を1つ金に格上げ（＝全枠金＝完全制覇へ）。
+          setExamSlots(prev => {
+            const slots = prev.slice(0, EXAM_SLOTS);
+            if (slots.length < EXAM_SLOTS) slots.push(tier);else if (gold) {
+              const i = slots.indexOf("silver");
+              if (i >= 0) slots[i] = "gold";
+            }
+            return slots;
+          });
+        }
+        setLastScore({
+          correct,
+          total,
+          pct,
+          exam: true,
+          pass,
+          gold,
+          tier: pass ? tier : null
+        });
+        setScreen("result");
       } else if (testMode === "review") {
         // 間違えた問題の復習: バッジ無し、結果画面へ
         setLastScore({
@@ -9072,13 +9159,17 @@ function App() {
         setScreen("result");
       } else if (testMode === "random") {
         // ランダム演習: バッジ無し、結果画面へ
+        // この回で間違えた問題を lastScore に持たせ、「この演習のミスに挑戦」導線に使う。
+        const missedIds = new Set(testResults.filter(r => !r.ok).map(r => r.id));
+        const missed = testQueue.filter(q => missedIds.has(q.id));
         setLastScore({
           correct,
           total,
           pct,
           badge: false,
           random: true,
-          label: randomLabel
+          label: randomLabel,
+          missed
         });
         setScreen("result");
       } else {
@@ -9414,7 +9505,7 @@ function App() {
         display: "flex",
         alignItems: "center",
         gap: 8,
-        marginBottom: 10
+        marginBottom: 6
       }
     }, /*#__PURE__*/React.createElement("span", {
       style: {
@@ -9423,20 +9514,27 @@ function App() {
       }
     }, "\uD83C\uDFB2 \u30E9\u30F3\u30C0\u30E0\u6F14\u7FD2"), /*#__PURE__*/React.createElement("span", {
       style: {
-        fontSize: 11,
-        fontWeight: 600,
-        color: "#5b6878"
+        fontSize: 10,
+        fontWeight: 800,
+        letterSpacing: 0.5,
+        color: "#9ec3ff",
+        background: "#16233a",
+        border: "1px solid #9ec3ff44",
+        borderRadius: 6,
+        padding: "1px 6px"
       }
-    }, "\u9806\u756A\u3092\u30B7\u30E3\u30C3\u30D5\u30EB\u3057\u3066\u89E3\u304F")), /*#__PURE__*/React.createElement("div", {
+    }, "\u5FA9\u7FD2")), /*#__PURE__*/React.createElement("div", {
       style: {
-        display: "flex",
-        gap: 10
+        fontSize: 11.5,
+        fontWeight: 600,
+        color: "#8794a6",
+        marginBottom: 11
       }
-    }, /*#__PURE__*/React.createElement("button", {
-      onClick: () => openRandomPick(0),
+    }, "\u5FD8\u308C\u304B\u3051\u305F\u30D6\u30ED\u30C3\u30AF\u3092\u9078\u3093\u3067\u30E9\u30F3\u30C0\u30E0", RANDOM_BLOCK_N, "\u554F\u3002\u8A18\u61B6\u306E\u30E1\u30F3\u30C6\u30CA\u30F3\u30B9\u306B\u3002"), /*#__PURE__*/React.createElement("button", {
+      onClick: openBlockRandom,
       className: "secbtn",
       style: {
-        flex: 1,
+        width: "100%",
         padding: "11px 0",
         borderRadius: 10,
         fontSize: 13.5,
@@ -9446,21 +9544,69 @@ function App() {
         border: "1px solid #3f6aa8",
         color: "#9ec3ff"
       }
-    }, "\u30D6\u30ED\u30C3\u30AF\u3092\u9078\u3093\u3067"), /*#__PURE__*/React.createElement("button", {
-      onClick: () => openRandomPick(-1),
-      className: "secbtn",
+    }, "\u30D6\u30ED\u30C3\u30AF\u3092\u9078\u3093\u3067\u5FA9\u7FD2\uFF08", RANDOM_BLOCK_N, "\u554F\uFF09")), /*#__PURE__*/React.createElement("div", {
       style: {
-        flex: 1,
-        padding: "11px 0",
-        borderRadius: 10,
-        fontSize: 13.5,
-        fontWeight: 800,
-        cursor: "pointer",
-        background: "#13241f",
-        border: "1px solid #2f6f5c",
+        marginTop: 14,
+        padding: "16px 16px 15px",
+        borderRadius: 14,
+        background: "linear-gradient(180deg,#16231d,#131b26)",
+        border: `1px solid ${examMastered ? "#e0a83088" : examComplete ? "#34d39e55" : "#2f6f5c"}`
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        display: "flex",
+        alignItems: "center",
+        gap: 8,
+        marginBottom: 4
+      }
+    }, /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontSize: 15,
+        fontWeight: 900,
         color: "#5ee0b4"
       }
-    }, "\uD83C\uDFAF \u7DCF\u5408\u30C6\u30B9\u30C8"))), /*#__PURE__*/React.createElement("div", {
+    }, "\uD83C\uDFAF \u7DCF\u5408\u30C6\u30B9\u30C8\uFF08\u6A21\u8A66\uFF09"), /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontSize: 10,
+        fontWeight: 800,
+        letterSpacing: 0.5,
+        color: "#f6c247",
+        background: "#2a220e",
+        border: "1px solid #e0a83055",
+        borderRadius: 6,
+        padding: "1px 6px"
+      }
+    }, "\u4ED5\u4E0A\u3052\u30FB\u672C\u756A\u5F62\u5F0F")), /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 11.5,
+        fontWeight: 600,
+        color: "#8794a6",
+        marginBottom: 12
+      }
+    }, "\u5168\u7BC4\u56F2\u304B\u3089", EXAM_SIZE, "\u554F\u30E9\u30F3\u30C0\u30E0\u51FA\u984C\u30FB", EXAM_PASS, "\u554F\uFF087\u5272\uFF09\u3067\u5408\u683C\uFF1D\u4FEE\u4E86\u30D0\u30C3\u30B8\uD83C\uDFC5\uFF0F", EXAM_GOLD, "\u554F\u4EE5\u4E0A\u3067\u91D1\uD83E\uDD47"), examStrip(26), /*#__PURE__*/React.createElement("div", {
+      style: {
+        textAlign: "center",
+        fontSize: 11.5,
+        fontWeight: 700,
+        marginTop: 8,
+        color: examMastered ? "#f6c247" : examComplete ? "#34d39e" : "#8794a6"
+      }
+    }, examMastered ? "🎉 完全制覇！" : `修了バッジ ${examSlots.length} / ${EXAM_SLOTS}`), /*#__PURE__*/React.createElement("button", {
+      onClick: startExam,
+      style: {
+        width: "100%",
+        marginTop: 13,
+        padding: "13px 0",
+        borderRadius: 11,
+        fontSize: 15,
+        fontWeight: 900,
+        cursor: "pointer",
+        color: "#10141c",
+        background: "linear-gradient(90deg,#5ee0b4,#34d39e)",
+        border: "none",
+        boxShadow: "0 0 20px #34d39e33"
+      }
+    }, "\uD83C\uDFAF \u6A21\u8A66\u306B\u6311\u6226\uFF08", Math.min(EXAM_SIZE, questions.length), "\u554F\uFF09")), /*#__PURE__*/React.createElement("div", {
       style: {
         display: "flex",
         gap: 18,
@@ -9470,7 +9616,10 @@ function App() {
       }
     }, /*#__PURE__*/React.createElement("button", {
       onClick: () => {
-        if (confirm("バッジ・成績をすべてリセットします。よろしいですか？")) setRecords({});
+        if (confirm("バッジ・成績をすべてリセットします（修了バッジも含む）。よろしいですか？")) {
+          setRecords({});
+          setExamSlots([]);
+        }
       },
       style: {
         ...linkBtn,
@@ -9694,30 +9843,8 @@ function App() {
     }, "\u30D6\u30ED\u30C3\u30AF\u4E00\u89A7\u3078"))));
   }
 
-  // ════════════════ RANDOMPICK（ランダム出題の範囲・問題数を選ぶ） ════════════════
+  // ════════════════ RANDOMPICK（ランダム演習＝復習用: ブロックを選ぶ） ════════════════
   if (screen === "randompick") {
-    const poolSize = poolOf(pickScope).length;
-    const countOpts = [...[10, 20, 30, 50, 100].filter(n => n < poolSize), poolSize]; // 全部=poolSize
-    const scopeChip = (label, scope) => {
-      const on = pickScope === scope;
-      return /*#__PURE__*/React.createElement("button", {
-        key: scope,
-        onClick: () => {
-          setPickScope(scope);
-          setPickCount(Math.min(pickCount, poolOf(scope).length));
-        },
-        style: {
-          padding: "8px 14px",
-          borderRadius: 999,
-          fontSize: 13,
-          fontWeight: 800,
-          cursor: "pointer",
-          border: `1px solid ${on ? "#5b9bff" : "#2a3543"}`,
-          background: on ? "#1a2740" : "#141b26",
-          color: on ? "#9ec3ff" : "#8b97a8"
-        }
-      }, label);
-    };
     return /*#__PURE__*/React.createElement("div", {
       style: wrap
     }, styleTag, /*#__PURE__*/React.createElement("div", {
@@ -9757,97 +9884,97 @@ function App() {
         fontWeight: 900,
         letterSpacing: 0.5
       }
-    }, "\uD83C\uDFB2 \u30E9\u30F3\u30C0\u30E0\u6F14\u7FD2"), /*#__PURE__*/React.createElement("span", {
+    }, "\uD83C\uDFB2 \u30E9\u30F3\u30C0\u30E0\u6F14\u7FD2\uFF08\u5FA9\u7FD2\uFF09"), /*#__PURE__*/React.createElement("span", {
       style: {
         width: 36
       },
       "aria-hidden": "true"
     })), /*#__PURE__*/React.createElement("p", {
       style: {
-        margin: "18px 0 10px",
+        margin: "18px 0 12px",
         fontSize: 12.5,
         lineHeight: 1.7,
         color: "#8794a6"
       }
-    }, "\u7BC4\u56F2\u3068\u554F\u984C\u6570\u3092\u9078\u3076\u3068\u3001\u305D\u306E\u4E2D\u304B\u3089", /*#__PURE__*/React.createElement("span", {
+    }, "\u5FD8\u308C\u304B\u3051\u305F\u30D6\u30ED\u30C3\u30AF\u3092\u9078\u3076\u3068\u3001\u305D\u306E\u4E2D\u304B\u3089", /*#__PURE__*/React.createElement("span", {
       style: {
         color: "#9ec3ff",
         fontWeight: 700
       }
-    }, "\u30E9\u30F3\u30C0\u30E0\u306A\u9806\u756A"), "\u3067\u51FA\u984C\u3057\u307E\u3059\u3002", /*#__PURE__*/React.createElement("br", null), "\u30D0\u30C3\u30B8\u5224\u5B9A\u306F\u306A\u3057\u30FB\u7D14\u7C8B\u306A\u6F14\u7FD2\u3067\u3059\u3002"), /*#__PURE__*/React.createElement("div", {
+    }, "\u30E9\u30F3\u30C0\u30E0", RANDOM_BLOCK_N, "\u554F"), "\u3092\u30B7\u30E3\u30C3\u30D5\u30EB\u3057\u3066\u51FA\u984C\u3057\u307E\u3059\u3002", /*#__PURE__*/React.createElement("br", null), "\u30D0\u30C3\u30B8\u5224\u5B9A\u306F\u306A\u3057\u30FB\u8A18\u61B6\u30E1\u30F3\u30C6\u30CA\u30F3\u30B9\u7528\u3067\u3059\u3002"), /*#__PURE__*/React.createElement("div", {
       style: {
         fontSize: 11,
         fontWeight: 800,
         letterSpacing: 2,
         color: "#5b7088",
-        margin: "14px 0 8px"
+        margin: "6px 0 10px"
       }
-    }, "\u7BC4\u56F2"), /*#__PURE__*/React.createElement("div", {
+    }, "\u5FA9\u7FD2\u3059\u308B\u30D6\u30ED\u30C3\u30AF\u3092\u9078\u3076"), /*#__PURE__*/React.createElement("div", {
       style: {
         display: "flex",
-        flexWrap: "wrap",
+        flexDirection: "column",
         gap: 8
       }
-    }, scopeChip("総合（全範囲）", -1), sections.map((_, i) => scopeChip(`ブロック${i + 1}`, i))), /*#__PURE__*/React.createElement("div", {
-      style: {
-        fontSize: 11,
-        fontWeight: 800,
-        letterSpacing: 2,
-        color: "#5b7088",
-        margin: "20px 0 8px"
-      }
-    }, "\u554F\u984C\u6570\uFF08\u7BC4\u56F2 ", poolSize, "\u554F\uFF09"), /*#__PURE__*/React.createElement("div", {
-      style: {
-        display: "flex",
-        flexWrap: "wrap",
-        gap: 8
-      }
-    }, countOpts.map(n => {
-      const on = pickCount === n;
+    }, sections.map((sec, i) => {
+      const blk = blocks[i] || {
+        no: i + 1,
+        kind: ""
+      };
       return /*#__PURE__*/React.createElement("button", {
-        key: n,
-        onClick: () => setPickCount(n),
+        key: i,
+        onClick: () => startRandom(i, RANDOM_BLOCK_N),
+        className: "secbtn",
         style: {
-          padding: "8px 16px",
-          borderRadius: 999,
+          display: "flex",
+          alignItems: "center",
+          gap: 12,
+          padding: "13px 14px",
+          borderRadius: 12,
+          cursor: "pointer",
+          background: "#141b26",
+          border: "1px solid #2a3543",
+          color: "#eceff4",
+          textAlign: "left",
+          width: "100%"
+        }
+      }, /*#__PURE__*/React.createElement("span", {
+        style: {
+          width: 28,
+          height: 28,
+          flex: "0 0 auto",
+          borderRadius: 8,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
           fontSize: 14,
           fontWeight: 800,
-          cursor: "pointer",
-          border: `1px solid ${on ? "#34d39e" : "#2a3543"}`,
-          background: on ? "#13241f" : "#141b26",
-          color: on ? "#5ee0b4" : "#8b97a8"
+          background: "#1a2740",
+          border: "1px solid #3f6aa8",
+          color: "#9ec3ff"
         }
-      }, n === poolSize ? `全部(${n})` : `${n}問`);
-    })), /*#__PURE__*/React.createElement("div", {
-      style: {
-        marginTop: 24,
-        textAlign: "center"
-      }
-    }, /*#__PURE__*/React.createElement("div", {
-      style: {
-        fontSize: 13,
-        color: "#8794a6",
-        marginBottom: 10
-      }
-    }, pickScope >= 0 ? `ブロック${pickScope + 1}` : "総合", " \u304B\u3089 ", /*#__PURE__*/React.createElement("span", {
-      style: {
-        fontSize: 18,
-        fontWeight: 900,
-        color: "#eceff4"
-      }
-    }, Math.min(pickCount, poolSize)), " \u554F\u3092\u30E9\u30F3\u30C0\u30E0\u51FA\u984C"), /*#__PURE__*/React.createElement("button", {
-      onClick: () => startRandom(pickScope, pickCount),
-      style: {
-        ...primaryBtn("linear-gradient(90deg,#5b9bff,#34d39e)"),
-        width: "100%"
-      }
-    }, "\uD83C\uDFB2 \u30B7\u30E3\u30C3\u30D5\u30EB\u3057\u3066\u958B\u59CB"), /*#__PURE__*/React.createElement("button", {
+      }, blk.no), /*#__PURE__*/React.createElement("span", {
+        style: {
+          flex: 1,
+          minWidth: 0,
+          fontSize: 14.5,
+          fontWeight: 800
+        }
+      }, sectionLabels[i]), /*#__PURE__*/React.createElement("span", {
+        style: {
+          fontSize: 11.5,
+          fontWeight: 800,
+          color: "#5ee0b4",
+          whiteSpace: "nowrap"
+        }
+      }, "\uD83C\uDFB2 ", Math.min(RANDOM_BLOCK_N, sec.length), "\u554F"));
+    })), /*#__PURE__*/React.createElement("button", {
       onClick: () => setScreen("home"),
       style: {
         ...linkBtn,
-        marginTop: 16
+        display: "block",
+        margin: "20px auto 0"
       }
-    }, "\u30DB\u30FC\u30E0\u3078"))));
+    }, "\u30DB\u30FC\u30E0\u3078")));
   }
 
   // ════════════════ STUDY（暗記: 10覚える→10テスト の繰り返し） ════════════════
@@ -10196,7 +10323,8 @@ function App() {
     const isSection = testMode === "section";
     const isReview = testMode === "review";
     const isRandom = testMode === "random";
-    const runTitle = isSection ? `${sectionLabels[secIdx]} テスト` : isReview ? "🔁 間違えた問題に挑戦" : isRandom ? `🎲 ${randomLabel} ランダム` : `第${studyChunk + 1}セット チェック`;
+    const isExam = testMode === "exam";
+    const runTitle = isSection ? `${sectionLabels[secIdx]} テスト` : isExam ? "🎯 総合テスト（模試）" : isReview ? "🔁 間違えた問題に挑戦" : isRandom ? `🎲 ${randomLabel} ランダム` : `第${studyChunk + 1}セット チェック`;
     return /*#__PURE__*/React.createElement("div", {
       style: wrap
     }, styleTag, /*#__PURE__*/React.createElement("div", {
@@ -10217,7 +10345,7 @@ function App() {
       }
     }, /*#__PURE__*/React.createElement("button", {
       onClick: () => {
-        if (isSection || isReview || isRandom) setScreen("home");else {
+        if (isRandom) openBlockRandom();else if (isSection || isReview || isExam) setScreen("home");else {
           setStudySub("learn");
           setScreen("study");
         }
@@ -10517,6 +10645,113 @@ function App() {
       pct: 0,
       badge: false
     };
+    if (s.exam) {
+      // 総合テスト（模試）の結果
+      const need = Math.max(0, EXAM_PASS - s.correct);
+      return /*#__PURE__*/React.createElement("div", {
+        style: wrap
+      }, styleTag, /*#__PURE__*/React.createElement("div", {
+        style: {
+          maxWidth: 460,
+          width: "100%",
+          textAlign: "center",
+          paddingTop: 30
+        }
+      }, /*#__PURE__*/React.createElement("div", {
+        style: {
+          fontSize: 13,
+          letterSpacing: 3,
+          opacity: 0.6
+        }
+      }, "\uD83C\uDFAF \u7DCF\u5408\u30C6\u30B9\u30C8\uFF08\u6A21\u8A66\uFF09\u306E\u7D50\u679C"), /*#__PURE__*/React.createElement("div", {
+        style: {
+          fontSize: 64,
+          fontWeight: 900,
+          lineHeight: 1.1,
+          margin: "10px 0 0",
+          color: s.pass ? s.gold ? "#f6c247" : "#34d39e" : "#c2cad8",
+          textShadow: s.pass ? s.gold ? "0 0 30px #f6c24766" : "0 0 28px #34d39e55" : "none"
+        }
+      }, s.correct, /*#__PURE__*/React.createElement("span", {
+        style: {
+          fontSize: 24,
+          opacity: 0.7
+        }
+      }, " / ", s.total)), /*#__PURE__*/React.createElement("div", {
+        style: {
+          fontSize: 14,
+          opacity: 0.6,
+          marginTop: 2
+        }
+      }, "\u6B63\u89E3\uFF08", s.pct, "%\uFF09\u30FB\u5408\u683C\u30E9\u30A4\u30F3 ", EXAM_PASS, "\u554F"), s.pass ? /*#__PURE__*/React.createElement("div", {
+        className: "card-in",
+        style: {
+          marginTop: 18
+        }
+      }, /*#__PURE__*/React.createElement("div", {
+        style: {
+          fontSize: 46
+        }
+      }, s.gold ? "🥇" : "🏅"), /*#__PURE__*/React.createElement("div", {
+        style: {
+          fontSize: 18,
+          fontWeight: 900,
+          color: s.gold ? "#f6c247" : "#34d39e",
+          marginTop: 2
+        }
+      }, s.gold ? "金の修了バッジ獲得！" : "合格・修了バッジ獲得！"), s.gold && /*#__PURE__*/React.createElement("div", {
+        style: {
+          fontSize: 12,
+          opacity: 0.75,
+          marginTop: 4
+        }
+      }, EXAM_GOLD, "\u554F\u4EE5\u4E0A\u306E\u8C6A\u83EF\u30D0\u30C3\u30B8 \u2728")) : /*#__PURE__*/React.createElement("div", {
+        style: {
+          marginTop: 18
+        }
+      }, /*#__PURE__*/React.createElement("div", {
+        style: {
+          fontSize: 20,
+          fontWeight: 900,
+          color: "#f6c247"
+        }
+      }, "\u4E0D\u5408\u683C"), /*#__PURE__*/React.createElement("div", {
+        style: {
+          fontSize: 13,
+          opacity: 0.6,
+          marginTop: 6,
+          lineHeight: 1.7
+        }
+      }, "\u3042\u3068", need, "\u554F\u3067\u5408\u683C\uFF08", EXAM_PASS, "\u554F\uFF1D7\u5272\uFF09\u3002")), /*#__PURE__*/React.createElement("div", {
+        style: {
+          marginTop: 22,
+          padding: "14px",
+          borderRadius: 13,
+          background: "#141b26",
+          border: "1px solid #232d3b"
+        }
+      }, examStrip(28), /*#__PURE__*/React.createElement("div", {
+        style: {
+          fontSize: 12,
+          fontWeight: 700,
+          marginTop: 9,
+          color: examMastered ? "#f6c247" : examComplete ? "#34d39e" : "#8794a6"
+        }
+      }, examMastered ? "🎉 完全制覇！" : `修了バッジ ${examSlots.length} / ${EXAM_SLOTS}`)), /*#__PURE__*/React.createElement("div", {
+        style: {
+          display: "flex",
+          flexDirection: "column",
+          gap: 10,
+          marginTop: 24
+        }
+      }, /*#__PURE__*/React.createElement("button", {
+        onClick: startExam,
+        style: primaryBtn("linear-gradient(90deg,#5ee0b4,#34d39e)")
+      }, "\uD83C\uDFAF \u3082\u3046\u4E00\u5EA6 \u7DCF\u5408\u30C6\u30B9\u30C8"), /*#__PURE__*/React.createElement("button", {
+        onClick: () => setScreen("home"),
+        style: ghostBtn
+      }, "\u30DB\u30FC\u30E0\u3078"))));
+    }
     if (s.review) {
       // 間違えた問題の復習結果
       const remain = wrongList.length;
@@ -10620,10 +10855,13 @@ function App() {
           gap: 10,
           marginTop: 26
         }
-      }, lastRandom && /*#__PURE__*/React.createElement("button", {
-        onClick: () => startRandom(lastRandom.scopeIdx, lastRandom.count),
+      }, s.missed && s.missed.length > 0 && /*#__PURE__*/React.createElement("button", {
+        onClick: () => startRandomMisses(s.missed),
+        style: primaryBtn("linear-gradient(90deg,#e0a830,#f6c247)")
+      }, "\uD83D\uDD01 \u3053\u306E\u6F14\u7FD2\u306E\u30DF\u30B9\u306B\u6311\u6226\uFF08", s.missed.length, "\u554F\uFF09"), /*#__PURE__*/React.createElement("button", {
+        onClick: openBlockRandom,
         style: primaryBtn("linear-gradient(90deg,#5b9bff,#34d39e)")
-      }, "\uD83C\uDFB2 \u3082\u3046\u4E00\u5EA6\u30E9\u30F3\u30C0\u30E0"), /*#__PURE__*/React.createElement("button", {
+      }, "\uD83C\uDFB2 \u3082\u3046\u4E00\u5EA6\u30E9\u30F3\u30C0\u30E0\uFF08\u30D6\u30ED\u30C3\u30AF\u3092\u9078\u3076\uFF09"), /*#__PURE__*/React.createElement("button", {
         onClick: () => setScreen("home"),
         style: ghostBtn
       }, "\u30DB\u30FC\u30E0\u3078"))));
