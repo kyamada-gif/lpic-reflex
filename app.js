@@ -4816,7 +4816,7 @@ const QUESTIONS = [{
     "text": "ldpath"
   }, {
     "label": "C",
-    "text": "dconfig"
+    "text": "ldconfig"
   }, {
     "label": "D",
     "text": "ldd"
@@ -4827,8 +4827,8 @@ const QUESTIONS = [{
   "decisionKey": "",
   "mnemonic": "",
   "answerKeys": ["次の中から、共有"],
-  "answerTexts": ["dconfig"],
-  "answerHints": ["dconfig"],
+  "answerTexts": ["ldconfig"],
+  "answerHints": ["ldconfig"],
   "chap": "第2章 Linuxのインストールとパッケージ管理"
 }, {
   "id": 340,
@@ -5089,7 +5089,7 @@ const QUESTIONS = [{
     "text": "dnf detail パッケージ名"
   }, {
     "label": "D",
-    "text": "ddnf info パッケージ名"
+    "text": "dnf info パッケージ名"
   }],
   "answer": ["D"],
   "selectCount": 1,
@@ -5097,8 +5097,8 @@ const QUESTIONS = [{
   "decisionKey": "",
   "mnemonic": "",
   "answerKeys": ["dnfコマンドでパッケージの詳細情報を表示するサブコマンドはどれか。"],
-  "answerTexts": ["ddnf info パッケージ名"],
-  "answerHints": ["ddnf"],
+  "answerTexts": ["dnf info パッケージ名"],
+  "answerHints": ["dnf"],
   "chap": "第2章 Linuxのインストールとパッケージ管理"
 }, {
   "id": 434,
@@ -5107,16 +5107,16 @@ const QUESTIONS = [{
   "question": "ソースコードからソフトウェアをビルドする際の一般的な手順として適切な説明を1つ選びなさい。",
   "choices": [{
     "label": "A",
-    "text": "coniigure > make install > make"
+    "text": "./configure → make install → make"
   }, {
     "label": "B",
-    "text": "make jnstall > make 一 ./Configure"
+    "text": "make install → make → ./configure"
   }, {
     "label": "C",
-    "text": "/configure つ make - make jnstall"
+    "text": "./configure → make → make install"
   }, {
     "label": "D",
-    "text": "make づつ ./configure > make install"
+    "text": "make → ./configure → make install"
   }],
   "answer": ["C"],
   "selectCount": 1,
@@ -5124,8 +5124,8 @@ const QUESTIONS = [{
   "decisionKey": "",
   "mnemonic": "",
   "answerKeys": ["ソースコード"],
-  "answerTexts": ["/configure つ make - make jnstall"],
-  "answerHints": ["/configure"],
+  "answerTexts": ["./configure → make → make install"],
+  "answerHints": ["./configure"],
   "chap": "第2章 Linuxのインストールとパッケージ管理"
 }, {
   "id": 100016,
