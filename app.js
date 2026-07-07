@@ -961,10 +961,10 @@ const QUESTIONS = [{
     "text": "pxe-ifconfig"
   }, {
     "label": "D",
-    "text": "grub2-mkconfig"
+    "text": "insmod"
   }, {
     "label": "E",
-    "text": "grub-mkconfig"
+    "text": "kpartx"
   }],
   "answer": ["A", "D"],
   "selectCount": 2,
@@ -972,8 +972,8 @@ const QUESTIONS = [{
   "decisionKey": "",
   "mnemonic": "",
   "answerKeys": ["GRUB"],
-  "answerTexts": ["menuentry", "grub2-mkconfig"],
-  "answerHints": ["menuentry", "grub2"],
+  "answerTexts": ["menuentry", "insmod"],
+  "answerHints": ["menuentry", "insmod"],
   "chap": "第2章 Linuxのインストールとパッケージ管理"
 }, {
   "id": 105,
@@ -1492,19 +1492,19 @@ const QUESTIONS = [{
   "question": "ファイルが存在しない場合のコマンド ls > files に関して正しいのは何ですか？",
   "choices": [{
     "label": "A",
-    "text": "history"
+    "text": "ls の出力は端末に印刷されます"
   }, {
     "label": "B",
-    "text": "setsh"
+    "text": "ファイルが作成され、ls の出力が含まれます"
   }, {
     "label": "C",
-    "text": "bashconf"
+    "text": "エラーメッセージが表示され、ls は実行されません"
   }, {
     "label": "D",
-    "text": "set"
+    "text": "コマンド files が実行され、ls の出力を受け取ります。"
   }, {
     "label": "E",
-    "text": "envsetup"
+    "text": "ls の出力はすべて破棄される"
   }],
   "answer": ["B"],
   "selectCount": 1,
@@ -1512,8 +1512,8 @@ const QUESTIONS = [{
   "decisionKey": "",
   "mnemonic": "",
   "answerKeys": ["ファイルが"],
-  "answerTexts": ["setsh"],
-  "answerHints": ["setsh"],
+  "answerTexts": ["ファイルが作成され、ls の出力が含まれます"],
+  "answerHints": ["ファイルが作成され、"],
   "chap": "第3章 GNUとUNIXコマンド"
 }, {
   "id": 63,
@@ -3231,14 +3231,14 @@ const QUESTIONS = [{
     "label": "E",
     "text": "GPT と MBR はどちらも最大 4 つのプライマリ パーティションをサポートし、各パーティションの最大容量は 4096 TB です。"
   }],
-  "answer": ["A", "B"],
+  "answer": ["B", "D"],
   "selectCount": 2,
   "identifyHint": "パーティションの最大数とサイズに関して、GPT パーティション テーブルと MBR パーティション テーブルの主な違い",
   "decisionKey": "",
   "mnemonic": "",
   "answerKeys": ["パーティション"],
-  "answerTexts": ["MBR は最大 4 TB のパーティション サイズを処理できますが、GPT は最大 128 ZB のパーティション サイズをサポートします。", "デフォルトでは、GPT は最大 128 個のパーティションを管理できますが、MBR は 4 つのプライマリ パーティションのみをサポートします。"],
-  "answerHints": ["MBR は最大 4", "デフォルトでは、GPT は最大 128"],
+  "answerTexts": ["デフォルトでは、GPT は最大 128 個のパーティションを管理できますが、MBR は 4 つのプライマリ パーティションのみをサポートします。", "MBR は最大 2.2 TB のパーティション サイズを処理できますが、GPT は最大 9.4 ZB のサイズをサポートします。"],
+  "answerHints": ["デフォルトでは、GP", "MBR は最大 2."],
   "chap": "第5章 デバイスとLinuxファイルシステム"
 }, {
   "id": 97,
@@ -3363,14 +3363,14 @@ const QUESTIONS = [{
     "label": "D",
     "text": "MBRパーティションテーブルのみ使用する"
   }],
-  "answer": ["D"],
+  "answer": ["A"],
   "selectCount": 1,
   "identifyHint": "UEFIがBIOSと比較して持つ利点として誤っている",
   "decisionKey": "",
   "mnemonic": "",
   "answerKeys": ["UEFIがBIOSと比較して持つ利点として誤ってい"],
-  "answerTexts": ["MBRパーティションテーブルのみ使用する"],
-  "answerHints": ["MBR"],
+  "answerTexts": ["ブートプロセスが常に遅くなる"],
+  "answerHints": ["ブートプロセスが常に"],
   "chap": "第1章 システムアーキテクチャ"
 }, {
   "id": 125,
@@ -3795,14 +3795,14 @@ const QUESTIONS = [{
     "label": "D",
     "text": "DMI/SMBIOSテーブルからハードウェア情報を表示する"
   }],
-  "answer": ["B"],
+  "answer": ["C"],
   "selectCount": 1,
   "identifyHint": "dmidecodeコマンドの用途として誤っている",
   "decisionKey": "",
   "mnemonic": "",
   "answerKeys": ["dmidecodeコマンドの用途として誤ってい"],
-  "answerTexts": ["カーネルモジュールを一覧表示する"],
-  "answerHints": ["カーネルモジュール"],
+  "answerTexts": ["ディスクのパーティションを作成する"],
+  "answerHints": ["ディスクのパーティシ"],
   "chap": "第1章 システムアーキテクチャ"
 }, {
   "id": 220,
@@ -6468,14 +6468,14 @@ const QUESTIONS = [{
     "label": "D",
     "text": "前のコマンドの標準出力を次のコマンドの標準入力に渡す"
   }],
-  "answer": ["C"],
+  "answer": ["A"],
   "selectCount": 1,
   "identifyHint": "パイプ (|) の機能として誤っているもの",
   "decisionKey": "",
   "mnemonic": "",
   "answerKeys": ["パイプ (|) の機能として誤ってい"],
-  "answerTexts": ["2つのコマンドを並列に実行する"],
-  "answerHints": ["2"],
+  "answerTexts": ["前のコマンドの標準エラーを次のコマンドの標準入力に渡す"],
+  "answerHints": ["前のコマンドの標準エ"],
   "chap": "第3章 GNUとUNIXコマンド"
 }, {
   "id": 489,
@@ -6927,14 +6927,14 @@ const QUESTIONS = [{
     "label": "D",
     "text": "root権限が必要である"
   }],
-  "answer": ["C"],
+  "answer": ["D"],
   "selectCount": 1,
   "identifyHint": "uniqコマンドの前提条件として誤っている",
   "decisionKey": "",
   "mnemonic": "",
   "answerKeys": ["uniqコマンドの前提条件として誤ってい"],
-  "answerTexts": ["入力がパイプからである必要がある"],
-  "answerHints": ["入力が"],
+  "answerTexts": ["root権限が必要である"],
+  "answerHints": ["root権限が必要で"],
   "chap": "第3章 GNUとUNIXコマンド"
 }, {
   "id": 446,
@@ -7494,14 +7494,14 @@ const QUESTIONS = [{
     "label": "D",
     "text": "Windowsでのみ使用できる"
   }],
-  "answer": ["D"],
+  "answer": ["A"],
   "selectCount": 1,
   "identifyHint": "ext4ファイルシステムの特徴として誤っている",
   "decisionKey": "",
   "mnemonic": "",
   "answerKeys": ["ext4ファイルシステムの特徴として誤ってい"],
-  "answerTexts": ["Windowsでのみ使用できる"],
-  "answerHints": ["Windows"],
+  "answerTexts": ["ジャーナリング機能を持たない軽量ファイルシステムである"],
+  "answerHints": ["ジャーナリング機能を"],
   "chap": "第5章 デバイスとLinuxファイルシステム"
 }, {
   "id": 100051,
@@ -7602,14 +7602,14 @@ const QUESTIONS = [{
     "label": "D",
     "text": "ファイルのグループが変更される"
   }],
-  "answer": ["D"],
+  "answer": ["B"],
   "selectCount": 1,
   "identifyHint": "SUIDが設定されたファイルの動作として誤っている",
   "decisionKey": "",
   "mnemonic": "",
   "answerKeys": ["SUIDが設定されたファイルの動作として誤ってい"],
-  "answerTexts": ["ファイルのグループが変更される"],
-  "answerHints": ["ファイルのグループ"],
+  "answerTexts": ["実行時にroot権限で動作する"],
+  "answerHints": ["実行時にroot権限"],
   "chap": "第5章 デバイスとLinuxファイルシステム"
 }, {
   "id": 100055,
@@ -8299,7 +8299,7 @@ const QUESTIONS = [{
     "text": "所有者: rw-、グループ: Fr-x、その他: rrx"
   }, {
     "label": "C",
-    "text": "所有者: rwx、グループ: rwx、その他:F-"
+    "text": "所有者: rwx、グループ: rwx、その他: r--"
   }, {
     "label": "D",
     "text": "所有者: rwx、グループ: Fx、その他: rx"
@@ -8310,8 +8310,8 @@ const QUESTIONS = [{
   "decisionKey": "",
   "mnemonic": "",
   "answerKeys": ["ファイルパーミッションで755の意味として誤ってい"],
-  "answerTexts": ["所有者: rwx、グループ: rwx、その他:F-"],
-  "answerHints": ["所有者: rwx、グループ: rwx"],
+  "answerTexts": ["所有者: rwx、グループ: rwx、その他: r--"],
+  "answerHints": ["所有者: rwx、グ"],
   "chap": "第5章 デバイスとLinuxファイルシステム"
 }];
 
