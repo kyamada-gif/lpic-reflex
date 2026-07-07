@@ -2419,7 +2419,7 @@ const QUESTIONS = [{
   "id": 29,
   "source": "模試",
   "type": "single",
-  "question": "コマンド ls -i からの次の出力を検討してください。a.txt\n525385 -rw-rw-r-- 2 1000 1000 0 Feb 12 19:44 a.txt\n525255 lrwxrwxrwx 1 1000 1000 5 Feb 12 19:44 b/txt -> a.txt\n(inode 525385)と同じ inode 番号を持つ c.txt という名前の新しいファイルはどのように作成されるでしょうか。",
+  "question": "コマンド ls -i からの次の出力を検討してください。a.txt\n525385 -rw-rw-r-- 2 1000 1000 0 Feb 12 19:44 a.txt\n525255 lrwxrwxrwx 1 1000 1000 5 Feb 12 19:44 b.txt -> a.txt\n(inode 525385)と同じ inode 番号を持つ c.txt という名前の新しいファイルはどのように作成されるでしょうか。",
   "choices": [{
     "label": "A",
     "text": "ln -h a.txt c.txt"
@@ -2438,7 +2438,7 @@ const QUESTIONS = [{
   }],
   "answer": ["C"],
   "selectCount": 1,
-  "identifyHint": "コマンド ls -i からの次の出力を検討してください。a.txt\n525385 -rw-rw-r-- 2 1000 1000 0 Feb 12 19:44 a.txt\n525255 lrwxrwxrwx 1 1000 1000 5 Feb 12 19:44 b/txt -> a.txt\n(inode 525385)と同じ inode 番号を持つ c.txt",
+  "identifyHint": "コマンド ls -i からの次の出力を検討してください。a.txt\n525385 -rw-rw-r-- 2 1000 1000 0 Feb 12 19:44 a.txt\n525255 lrwxrwxrwx 1 1000 1000 5 Feb 12 19:44 b.txt -> a.txt\n(inode 525385)と同じ inode 番号を持つ c.txt",
   "decisionKey": "",
   "mnemonic": "",
   "answerKeys": ["コマンド ls"],
@@ -4168,7 +4168,7 @@ const QUESTIONS = [{
     "text": "/etc/yum.repos.d/"
   }, {
     "label": "C",
-    "text": "/etc/apsources.list.d/"
+    "text": "/etc/apt/sources.list.d/"
   }, {
     "label": "D",
     "text": "/var/lib/yum/"
@@ -4222,7 +4222,7 @@ const QUESTIONS = [{
     "text": "dnf info パッケージ名"
   }, {
     "label": "C",
-    "text": "dnf detal パッケージ名"
+    "text": "dnf detail パッケージ名"
   }, {
     "label": "D",
     "text": "dnf show パッケージ名"
@@ -4794,14 +4794,14 @@ const QUESTIONS = [{
     "label": "D",
     "text": "-ivh"
   }],
-  "answer": ["A"],
+  "answer": ["B"],
   "selectCount": 1,
   "identifyHint": "RPMパッケージをインストールするrpmコマンドのオプションとして誤っている",
   "decisionKey": "",
   "mnemonic": "",
   "answerKeys": ["RPMパッケージを"],
-  "answerTexts": ["-Uvh"],
-  "answerHints": ["-Uvh"],
+  "answerTexts": ["-qvh"],
+  "answerHints": ["-qvh"],
   "chap": "第2章 Linuxのインストールとパッケージ管理"
 }, {
   "id": 316,
@@ -4840,13 +4840,13 @@ const QUESTIONS = [{
     "text": "dnf install パッケージ名"
   }, {
     "label": "B",
-    "text": "zypper instal パッケージ名"
+    "text": "zypper install パッケージ名"
   }, {
     "label": "C",
     "text": "yum install パッケージ名"
   }, {
     "label": "D",
-    "text": "apt instal パッケージ名"
+    "text": "apt install パッケージ名"
   }],
   "answer": ["D"],
   "selectCount": 1,
@@ -4854,7 +4854,7 @@ const QUESTIONS = [{
   "decisionKey": "",
   "mnemonic": "",
   "answerKeys": ["次の中から、debian"],
-  "answerTexts": ["apt instal パッケージ名"],
+  "answerTexts": ["apt install パッケージ名"],
   "answerHints": ["apt"],
   "chap": "第2章 Linuxのインストールとパッケージ管理"
 }, {
@@ -4867,7 +4867,7 @@ const QUESTIONS = [{
     "text": "BOOTMGR"
   }, {
     "label": "B",
-    "text": "LHLO"
+    "text": "LILO"
   }, {
     "label": "C",
     "text": "GRUB2"
@@ -4972,16 +4972,16 @@ const QUESTIONS = [{
   "question": "Debianベースのシステムでパッケージをインストールするコマンドとして適切な説明を1つ選びなさい。",
   "choices": [{
     "label": "A",
-    "text": "yum instal パッケージ名"
+    "text": "yum install パッケージ名"
   }, {
     "label": "B",
     "text": "dnf install パッケージ名"
   }, {
     "label": "C",
-    "text": "apt instal パッケージ名"
+    "text": "apt install パッケージ名"
   }, {
     "label": "D",
-    "text": "zypper instal パッケージ名"
+    "text": "zypper install パッケージ名"
   }],
   "answer": ["C"],
   "selectCount": 1,
@@ -4989,7 +4989,7 @@ const QUESTIONS = [{
   "decisionKey": "",
   "mnemonic": "",
   "answerKeys": ["Debianベース"],
-  "answerTexts": ["apt instal パッケージ名"],
+  "answerTexts": ["apt install パッケージ名"],
   "answerHints": ["apt"],
   "chap": "第2章 Linuxのインストールとパッケージ管理"
 }, {
@@ -5059,7 +5059,7 @@ const QUESTIONS = [{
     "text": "ldd"
   }, {
     "label": "C",
-    "text": "Idpath"
+    "text": "ldpath"
   }, {
     "label": "D",
     "text": "Hbupdate"
@@ -5191,10 +5191,10 @@ const QUESTIONS = [{
     "text": "-m"
   }, {
     "label": "B",
-    "text": "で"
+    "text": "-c"
   }, {
     "label": "C",
-    "text": "-"
+    "text": "-l"
   }, {
     "label": "D",
     "text": "-w"
@@ -5205,8 +5205,8 @@ const QUESTIONS = [{
   "decisionKey": "",
   "mnemonic": "",
   "answerKeys": ["次の中から、wc"],
-  "answerTexts": ["-"],
-  "answerHints": ["-"],
+  "answerTexts": ["-l"],
+  "answerHints": ["-l"],
   "chap": "第3章 GNUとUNIXコマンド"
 }, {
   "id": 100019,
@@ -5242,7 +5242,7 @@ const QUESTIONS = [{
   "question": "次の中から、wcコマンドでファイルの行数のみを表示するオプションはどれか。",
   "choices": [{
     "label": "A",
-    "text": "|"
+    "text": "-l"
   }, {
     "label": "B",
     "text": "-c"
@@ -5259,8 +5259,8 @@ const QUESTIONS = [{
   "decisionKey": "",
   "mnemonic": "",
   "answerKeys": ["次の中から、wc"],
-  "answerTexts": ["|"],
-  "answerHints": ["|"],
+  "answerTexts": ["-l"],
+  "answerHints": ["-l"],
   "chap": "第3章 GNUとUNIXコマンド"
 }, {
   "id": 100021,
@@ -5269,16 +5269,16 @@ const QUESTIONS = [{
   "question": "findコマンドで/homeディレクトリ配下のすべての.txtファイルを検索する正しい記述はどれか。",
   "choices": [{
     "label": "A",
-    "text": "find /home -name \".txf"
+    "text": "find /home -name \"*.txt\""
   }, {
     "label": "B",
-    "text": "find /home -search \".tY'"
+    "text": "find /home -search \"*.txt\""
   }, {
     "label": "C",
-    "text": "find home -type \".bY"
+    "text": "find /home -type \"*.txt\""
   }, {
     "label": "D",
-    "text": "fnd /home -ext kt"
+    "text": "find /home -ext txt"
   }],
   "answer": ["A"],
   "selectCount": 1,
@@ -5286,7 +5286,7 @@ const QUESTIONS = [{
   "decisionKey": "",
   "mnemonic": "",
   "answerKeys": ["findコマンドで/homeディレクトリ配下のすべての.txtファイルを検索する正しい記述はどれか。"],
-  "answerTexts": ["find /home -name \".txf"],
+  "answerTexts": ["find /home -name \"*.txt\""],
   "answerHints": ["find /home -name"],
   "chap": "第3章 GNUとUNIXコマンド"
 }, {
@@ -5305,7 +5305,7 @@ const QUESTIONS = [{
     "text": "head -120"
   }, {
     "label": "D",
-    "text": "head -hn 20"
+    "text": "head -n 20"
   }],
   "answer": ["D"],
   "selectCount": 1,
@@ -5313,8 +5313,8 @@ const QUESTIONS = [{
   "decisionKey": "",
   "mnemonic": "",
   "answerKeys": ["head"],
-  "answerTexts": ["head -hn 20"],
-  "answerHints": ["head -hn"],
+  "answerTexts": ["head -n 20"],
+  "answerHints": ["head -n"],
   "chap": "第3章 GNUとUNIXコマンド"
 }, {
   "id": 136,
@@ -5536,13 +5536,13 @@ const QUESTIONS = [{
   "id": 395,
   "source": "想定",
   "type": "single",
-  "question": "sedコマンドでファイル内のすべての'old'をnew'に置換する正しい記述はどれか。",
+  "question": "sedコマンドでファイル内のすべての'old'を'new'に置換する正しい記述はどれか。",
   "choices": [{
     "label": "A",
-    "text": "sed 's/old/new/d' file"
+    "text": "sed 's/old/new/g' file"
   }, {
     "label": "B",
-    "text": "sed replace/old/new' fille"
+    "text": "sed replace/old/new' file"
   }, {
     "label": "C",
     "text": "sed 'change old new fe"
@@ -5556,7 +5556,7 @@ const QUESTIONS = [{
   "decisionKey": "",
   "mnemonic": "sedの置換＝s/old/new/。「sedのsはsubstitute（置換）」。",
   "answerKeys": ["sedコマンドでファイル内のすべての'old'をnew"],
-  "answerTexts": ["sed 's/old/new/d' file"],
+  "answerTexts": ["sed 's/old/new/g' file"],
   "answerHints": ["sed 's"],
   "chap": "第3章 GNUとUNIXコマンド"
 }, {
@@ -6049,7 +6049,7 @@ const QUESTIONS = [{
   "id": 145,
   "source": "想定",
   "type": "single",
-  "question": "sedコマンドでファイル内のすべてのold'をnew'に置換する正しい記述はどれか。",
+  "question": "sedコマンドでファイル内のすべての'old'を'new'に置換する正しい記述はどれか。",
   "choices": [{
     "label": "A",
     "text": "sed 's/old/new/g' file"
@@ -7129,7 +7129,7 @@ const QUESTIONS = [{
   "id": 167,
   "source": "想定",
   "type": "single",
-  "question": "スティッキービットが設定されたディレクトリの動作として適切な説明を1 つ選びなさい。",
+  "question": "スティッキービットが設定されたディレクトリの動作として適切な説明を1つ選びなさい。",
   "choices": [{
     "label": "A",
     "text": "ディレクトリの読み取りが制限される"
@@ -7219,7 +7219,7 @@ const QUESTIONS = [{
     "text": "所有者: rwx、グループ: rw-、その他: r--"
   }, {
     "label": "C",
-    "text": "所有者: rwx、グループ: rx、その他: rx"
+    "text": "所有者: rwx、グループ: r-x、その他: r-x"
   }, {
     "label": "D",
     "text": "所有者: rw-、グループ: r-x、その他: r-x"
@@ -7230,8 +7230,8 @@ const QUESTIONS = [{
   "decisionKey": "",
   "mnemonic": "",
   "answerKeys": ["ファイルパーミッションで755の意味として正しいも"],
-  "answerTexts": ["所有者: rwx、グループ: rx、その他: rx"],
-  "answerHints": ["所有者: rwx、グループ: rx"],
+  "answerTexts": ["所有者: rwx、グループ: r-x、その他: r-x"],
+  "answerHints": ["所有者: rwx、グループ: r-x"],
   "chap": "第5章 デバイスとLinuxファイルシステム"
 }, {
   "id": 280,
@@ -7510,7 +7510,7 @@ const QUESTIONS = [{
   "question": "次の中から、ファイルパーミッションで755の意味として正しいものはどれか。",
   "choices": [{
     "label": "A",
-    "text": "所有者: rwx、グループ: r-x、その他:rrx"
+    "text": "所有者: rwx、グループ: r-x、その他:r-x"
   }, {
     "label": "B",
     "text": "所有者: rwx、グループ: rw-、その他:F-"
@@ -7527,7 +7527,7 @@ const QUESTIONS = [{
   "decisionKey": "",
   "mnemonic": "",
   "answerKeys": ["次の中から、ファイルパーミッション"],
-  "answerTexts": ["所有者: rwx、グループ: r-x、その他:rrx"],
+  "answerTexts": ["所有者: rwx、グループ: r-x、その他:r-x"],
   "answerHints": ["所有者: rwx、グループ: r-x"],
   "chap": "第5章 デバイスとLinuxファイルシステム"
 }, {
@@ -7564,16 +7564,16 @@ const QUESTIONS = [{
   "question": "次の中から、umask 022の場合、新規作成されるファイルのデフォルトパーミッションはどれか。",
   "choices": [{
     "label": "A",
-    "text": "666 (fw-Tw-「w-)"
+    "text": "666 (rw-rw-rw-)"
   }, {
     "label": "B",
-    "text": "755 (rwXr-X「-%)"
+    "text": "755 (rwxr-xr-x)"
   }, {
     "label": "C",
-    "text": "644 (fw-r--「--)"
+    "text": "644 (rw-r--r--)"
   }, {
     "label": "D",
-    "text": "600 (rw-......)"
+    "text": "600 (rw-------)"
   }],
   "answer": ["C"],
   "selectCount": 1,
@@ -7581,7 +7581,7 @@ const QUESTIONS = [{
   "decisionKey": "",
   "mnemonic": "",
   "answerKeys": ["次の中から、umask"],
-  "answerTexts": ["644 (fw-r--「--)"],
+  "answerTexts": ["644 (rw-r--r--)"],
   "answerHints": ["644"],
   "chap": "第5章 デバイスとLinuxファイルシステム"
 }, {
@@ -7621,7 +7621,7 @@ const QUESTIONS = [{
     "text": "所有者: rwx、グループ: rw-、その他: r--"
   }, {
     "label": "B",
-    "text": "所有者: rwx、グループ: rrx、その他:r-x"
+    "text": "所有者: rwx、グループ: r-x、その他:r-x"
   }, {
     "label": "C",
     "text": "所有者: rwx、グループ: rwx、その他: r-"
@@ -7635,8 +7635,8 @@ const QUESTIONS = [{
   "decisionKey": "",
   "mnemonic": "",
   "answerKeys": ["ファイルパーミッションで755の意味として適切な"],
-  "answerTexts": ["所有者: rwx、グループ: rrx、その他:r-x"],
-  "answerHints": ["所有者: rwx、グループ: rrx"],
+  "answerTexts": ["所有者: rwx、グループ: r-x、その他:r-x"],
+  "answerHints": ["所有者: rwx、グループ: r-x"],
   "chap": "第5章 デバイスとLinuxファイルシステム"
 }, {
   "id": 100056,
