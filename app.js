@@ -8574,7 +8574,9 @@ function HideAnswer({
 //  ・答えはホバー/タップで表示（赤シート式）。
 function StudyCard({
   q,
-  mono
+  mono,
+  flagged,
+  onToggleFlag
 }) {
   const [showChoices, setShowChoices] = useState(true); // 暗記のテンポ優先：最初から正解の選択肢を開いておく（折りたたみも可）
   const ansSet = new Set(q.answer);
@@ -8586,7 +8588,7 @@ function StudyCard({
   return /*#__PURE__*/React.createElement("div", {
     style: {
       background: "#181f2a",
-      border: "1px solid #2a3543",
+      border: `1px solid ${flagged ? "#f6c24766" : "#2a3543"}`,
       borderRadius: 12,
       padding: "14px 16px",
       marginBottom: 10
@@ -8620,7 +8622,28 @@ function StudyCard({
     color: "#5cc8f5",
     on: true,
     variant: "soft"
-  })), showChoices && (q.type !== "fill" ? /*#__PURE__*/React.createElement("div", {
+  })), /*#__PURE__*/React.createElement("button", {
+    onClick: onToggleFlag,
+    "aria-pressed": !!flagged,
+    style: {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 7,
+      width: "100%",
+      marginTop: 10,
+      padding: "9px 0",
+      borderRadius: 10,
+      cursor: "pointer",
+      fontSize: 13,
+      fontWeight: 800,
+      transition: "background .15s, border-color .15s, box-shadow .15s",
+      background: flagged ? "linear-gradient(90deg,#e0a830,#f6c247)" : "#141b26",
+      border: `1.5px solid ${flagged ? "#f6c247" : "#3a4658"}`,
+      color: flagged ? "#241a05" : "#c2cad8",
+      boxShadow: flagged ? "0 0 14px #f6c24755" : "none"
+    }
+  }, flagged ? "🔖 要復習に登録中（押して解除）" : "🔖 要復習に追加する"), showChoices && (q.type !== "fill" ? /*#__PURE__*/React.createElement("div", {
     className: "card-in",
     style: {
       marginTop: 10,
@@ -8793,6 +8816,29 @@ function App() {
     } catch (e) {}
   }, [wrongIds]);
 
+  // 要復習フラグ（id→true）。正解・不正解に関係なくユーザーが手動でON/OFF。自動では外れない・localStorageで永続化。
+  const [flaggedIds, setFlaggedIds] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("reflex-flagged") || "{}");
+    } catch {
+      return {};
+    }
+  });
+  useEffect(() => {
+    try {
+      localStorage.setItem("reflex-flagged", JSON.stringify(flaggedIds));
+    } catch (e) {}
+  }, [flaggedIds]);
+  function toggleFlag(id) {
+    setFlaggedIds(f => {
+      const n = {
+        ...f
+      };
+      if (n[id]) delete n[id];else n[id] = true;
+      return n;
+    });
+  }
+
   // 暗記モード: 10問ずつ「覚える→テスト」を繰り返す
   const [studyChunk, setStudyChunk] = useState(0); // 現在の10問セット
   const [studySub, setStudySub] = useState("learn"); // learn | quizdone
@@ -8820,6 +8866,7 @@ function App() {
   const [phase, setPhase] = useState("answer"); // answer | reveal
   const [multiSel, setMultiSel] = useState([]);
   const [fillVal, setFillVal] = useState("");
+  const [cursor, setCursor] = useState(0); // PC操作：矢印でハイライト中の選択肢index
   const [lastOk, setLastOk] = useState(null);
   const [lastInput, setLastInput] = useState(null); // 直近のユーザー回答（選択肢の印用）
   const [lastScore, setLastScore] = useState(null); // セクション結果画面用
@@ -8835,6 +8882,7 @@ function App() {
   const chunkQs = secQuestions.slice(studyChunk * PAGE_SIZE, studyChunk * PAGE_SIZE + PAGE_SIZE);
   const badgeCount = Object.values(records).filter(r => r && r.badge).length;
   const wrongList = questions.filter(q => wrongIds[q.id]); // 間違えた問題
+  const flaggedList = questions.filter(q => flaggedIds[q.id]); // 要復習フラグを付けた問題（手動で外すまで残る）
 
   // ── 覚える進捗（セット単位） ──
   const blockChunks = i => Math.max(1, Math.ceil((sections[i] || []).length / PAGE_SIZE)); // そのブロックのセット数
@@ -8971,6 +9019,10 @@ function App() {
   function startReview() {
     beginRun(wrongList.slice(), "review");
   } // 間違えた問題に挑戦
+  // 要復習フラグを付けた問題に挑戦（正解するまで繰り返す・フラグは正解しても外れない＝ユーザーが手動で外すまで残る）
+  function startFlagged() {
+    if (flaggedList.length) beginRun(shuffle(flaggedList), "flagged");
+  }
 
   // ── ランダム出題 ──
   const poolOf = scope => scope >= 0 ? sections[scope] || [] : questions; // 0〜7=ブロック
@@ -9037,8 +9089,8 @@ function App() {
     setLastOk(null);
     setRetry(true);
   }
-  // 「正解するまで繰り返す」覚えるモード挙動を使うモード（暗記10問／ランダム演習／総合テストの覚え直し）。
-  const isCram = m => m === "study" || m === "random" || m === "exammiss";
+  // 「正解するまで繰り返す」覚えるモード挙動を使うモード（暗記10問／ランダム演習／総合テストの覚え直し／要復習）。
+  const isCram = m => m === "study" || m === "random" || m === "exammiss" || m === "flagged";
   function nextTest() {
     const next = testPos + 1;
     if (next >= testQueue.length) {
@@ -9116,6 +9168,16 @@ function App() {
           missed
         });
         setScreen("result");
+      } else if (testMode === "flagged") {
+        // 要復習フラグの挑戦: バッジ無し、フラグは正解しても外れない（結果画面は現在のフラグ数を見る）
+        setLastScore({
+          correct,
+          total,
+          pct,
+          badge: false,
+          flagged: true
+        });
+        setScreen("result");
       } else if (testMode === "review") {
         // 間違えた問題の復習: バッジ無し、結果画面へ
         setLastScore({
@@ -9174,7 +9236,12 @@ function App() {
     setRetry(false);
   }
 
-  // キーボード（テスト）: single=A〜E/1〜5、reveal=Enterで次へ
+  // 問題が変わったらハイライト位置を先頭に戻す
+  useEffect(() => {
+    setCursor(0);
+  }, [testPos, screen]);
+
+  // キーボード（テスト）: 矢印↑↓で選択肢を移動→Enterで決定。single=A〜E/1〜5即決も併用、multi=Spaceで選択。reveal=Enterで次へ
   useEffect(() => {
     if (screen !== "test") return;
     const q = testQueue[testPos];
@@ -9189,7 +9256,29 @@ function App() {
         return;
       }
       if (!q) return;
+      // 矢印で選択肢ハイライトを移動（single / multi 共通）。↑←=上/↓→=下。
+      // multi は選択肢の次に「決定」ボタンも移動先に含める（最後の位置＝決定ボタン）。
+      if ((q.type === "single" || q.type === "multi") && q.choices.length) {
+        const maxIdx = q.type === "multi" ? q.choices.length : q.choices.length - 1;
+        if (e.key === "ArrowDown" || e.key === "ArrowRight") {
+          e.preventDefault();
+          setCursor(c => Math.min(c + 1, maxIdx));
+          return;
+        }
+        if (e.key === "ArrowUp" || e.key === "ArrowLeft") {
+          e.preventDefault();
+          setCursor(c => Math.max(c - 1, 0));
+          return;
+        }
+      }
       if (q.type === "single") {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          const c = q.choices[cursor];
+          if (c) submitAnswer([c.label]);
+          return;
+        }
+        // A〜E / 1〜5 の即決も従来どおり使える
         const map = {
           a: "A",
           b: "B",
@@ -9204,11 +9293,49 @@ function App() {
         };
         const lab = map[e.key.toLowerCase()];
         if (lab && q.choices.some(c => c.label === lab)) submitAnswer([lab]);
+      } else if (q.type === "multi") {
+        // カーソルが選択肢の位置ならEnterでON/OFF、決定ボタンの位置（=choices.length）ならEnterで決定（マウスクリックと同じ効果）。
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          if (cursor >= q.choices.length) {
+            if (multiSel.length) submitAnswer(multiSel);
+            return;
+          }
+          const c = q.choices[cursor];
+          if (!c) return;
+          setMultiSel(s => s.includes(c.label) ? s.filter(x => x !== c.label) : [...s, c.label]);
+          return;
+        }
       }
     };
     window.addEventListener("keydown", h);
     return () => window.removeEventListener("keydown", h);
   });
+
+  // メニュー系画面（test以外＝ホーム/結果/ランダム選択/テスト選択/暗記など）: ↑↓で画面内のボタンを巡回フォーカス、Enterは標準でそのボタンを実行。
+  useEffect(() => {
+    if (screen === "test") return; // テスト画面は独自のキーボード操作を持つ
+    const getBtns = () => Array.from(document.querySelectorAll("button")).filter(b => !b.disabled && b.offsetParent !== null);
+    // 初期フォーカス: 意味のあるラベル（3文字以上）を持つ最初のボタン＝主要アクションに寄せる（← 等のアイコンボタンは初期選択から外す。矢印では行ける）
+    const btns = getBtns();
+    if (btns.length && !btns.includes(document.activeElement)) {
+      (btns.find(b => (b.textContent || "").trim().length >= 3) || btns[0]).focus();
+    }
+    const h = e => {
+      const tag = document.activeElement && document.activeElement.tagName || "";
+      if (tag === "INPUT" || tag === "TEXTAREA") return; // 入力欄では矢印を奪わない
+      if (!["ArrowDown", "ArrowUp", "ArrowRight", "ArrowLeft"].includes(e.key)) return;
+      const list = getBtns();
+      if (!list.length) return;
+      e.preventDefault();
+      const idx = list.indexOf(document.activeElement);
+      const down = e.key === "ArrowDown" || e.key === "ArrowRight";
+      const n = idx < 0 ? 0 : down ? Math.min(idx + 1, list.length - 1) : Math.max(idx - 1, 0);
+      list[n].focus();
+    };
+    window.addEventListener("keydown", h);
+    return () => window.removeEventListener("keydown", h);
+  }, [screen]);
   const styleTag = /*#__PURE__*/React.createElement("style", null, `
       .hideans{ filter: blur(6px); cursor: pointer; transition: filter .12s; border-radius: 5px; }
       .hideans:hover, .hideans.shown{ filter: none; }
@@ -9315,7 +9442,22 @@ function App() {
         color: "#c2cad8",
         fontWeight: 700
       }
-    }, "\u51688\u500B\u306E\u30D0\u30C3\u30B8\u3092\u96C6\u3081\u305F\u3089\u3001\u6E96\u5099\u5B8C\u4E86\uFF01")), /*#__PURE__*/React.createElement("div", {
+    }, "\u51688\u500B\u306E\u30D0\u30C3\u30B8\u3092\u96C6\u3081\u305F\u3089\u3001\u6E96\u5099\u5B8C\u4E86\uFF01")), flaggedList.length > 0 && /*#__PURE__*/React.createElement("button", {
+      onClick: startFlagged,
+      className: "secbtn",
+      style: {
+        width: "100%",
+        marginBottom: 14,
+        padding: "11px 0",
+        borderRadius: 10,
+        fontSize: 13.5,
+        fontWeight: 800,
+        cursor: "pointer",
+        background: "#241f10",
+        border: "1px solid #6a5a2a",
+        color: "#f6c247"
+      }
+    }, "\uD83D\uDD16 \u8981\u5FA9\u7FD2\u306B\u6311\u6226\uFF08", flaggedList.length, "\u554F\uFF09"), /*#__PURE__*/React.createElement("div", {
       style: {
         display: "flex",
         flexDirection: "column",
@@ -9580,7 +9722,7 @@ function App() {
         display: "flex",
         gap: 18,
         justifyContent: "center",
-        marginTop: 22,
+        marginTop: 14,
         paddingBottom: 6
       }
     }, /*#__PURE__*/React.createElement("button", {
@@ -10301,7 +10443,9 @@ function App() {
     }, chunkQs.map(q => /*#__PURE__*/React.createElement(StudyCard, {
       key: q.id,
       q: q,
-      mono: mono
+      mono: mono,
+      flagged: !!flaggedIds[q.id],
+      onToggleFlag: () => toggleFlag(q.id)
     })))), /*#__PURE__*/React.createElement("div", {
       style: {
         position: "fixed",
@@ -10364,7 +10508,8 @@ function App() {
     const isRandom = testMode === "random";
     const isExam = testMode === "exam";
     const isExamMiss = testMode === "exammiss";
-    const runTitle = isSection ? `${sectionLabels[secIdx]} テスト` : isExam ? "🎯 総合テスト（模試）" : isExamMiss ? "🔁 総合テストの覚え直し" : isReview ? "🔁 間違えた問題に挑戦" : isRandom ? `🎲 ${randomLabel} ランダム` : `第${studyChunk + 1}セット チェック`;
+    const isFlagged = testMode === "flagged";
+    const runTitle = isSection ? `${sectionLabels[secIdx]} テスト` : isExam ? "🎯 総合テスト（模試）" : isExamMiss ? "🔁 総合テストの覚え直し" : isFlagged ? "🔖 要復習に挑戦" : isReview ? "🔁 間違えた問題に挑戦" : isRandom ? `🎲 ${randomLabel} ランダム` : `第${studyChunk + 1}セット チェック`;
     return /*#__PURE__*/React.createElement("div", {
       style: wrap
     }, styleTag, /*#__PURE__*/React.createElement("div", {
@@ -10385,7 +10530,7 @@ function App() {
       }
     }, /*#__PURE__*/React.createElement("button", {
       onClick: () => {
-        if (isRandom) openBlockRandom();else if (isSection || isReview || isExam || isExamMiss) setScreen("home");else {
+        if (isRandom) openBlockRandom();else if (isSection || isReview || isExam || isExamMiss || isFlagged) setScreen("home");else {
           setStudySub("learn");
           setScreen("study");
         }
@@ -10416,7 +10561,28 @@ function App() {
         background: "linear-gradient(90deg,#5b9bff,#34d39e)",
         transition: "width .3s"
       }
-    })), /*#__PURE__*/React.createElement("div", {
+    })), /*#__PURE__*/React.createElement("button", {
+      onClick: () => toggleFlag(q.id),
+      "aria-pressed": !!flaggedIds[q.id],
+      style: {
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 7,
+        width: "100%",
+        marginTop: 12,
+        padding: "11px 0",
+        borderRadius: 12,
+        cursor: "pointer",
+        fontSize: 14,
+        fontWeight: 800,
+        transition: "background .15s, border-color .15s, box-shadow .15s",
+        background: flaggedIds[q.id] ? "linear-gradient(90deg,#e0a830,#f6c247)" : "#161d28",
+        border: `1.5px solid ${flaggedIds[q.id] ? "#f6c247" : "#3a4658"}`,
+        color: flaggedIds[q.id] ? "#241a05" : "#c2cad8",
+        boxShadow: flaggedIds[q.id] ? "0 0 16px #f6c24755" : "none"
+      }
+    }, flaggedIds[q.id] ? "🔖 要復習に登録中（押して解除）" : "🔖 要復習に追加する"), /*#__PURE__*/React.createElement("div", {
       className: phase === "reveal" && !lastOk ? "shake" : "",
       style: {
         marginTop: 16,
@@ -10555,11 +10721,18 @@ function App() {
         flexDirection: "column",
         gap: 9
       }
-    }, q.choices.map(c => /*#__PURE__*/React.createElement("button", {
+    }, q.choices.map((c, i) => /*#__PURE__*/React.createElement("button", {
       key: c.label,
       className: "choice",
+      onMouseDown: e => e.preventDefault(),
       onClick: () => submitAnswer([c.label]),
-      style: choiceRow("#1b2330", "#2a3543")
+      onMouseEnter: () => setCursor(i),
+      style: {
+        ...choiceRow("#1b2330", "#2a3543"),
+        ...(i === cursor ? {
+          boxShadow: "inset 0 0 0 2px #8ef0cf"
+        } : {})
+      }
     }, /*#__PURE__*/React.createElement("span", {
       style: {
         fontSize: 11,
@@ -10573,19 +10746,33 @@ function App() {
         fontFamily: mono,
         lineHeight: 1.5
       }
-    }, c.text)))), q.type === "multi" && /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    }, c.text))), /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 11,
+        opacity: 0.4,
+        marginTop: 4,
+        textAlign: "center"
+      }
+    }, "\u2191\u2193\u3067\u79FB\u52D5\u30FBEnter\u3067\u6C7A\u5B9A\uFF08A\u301CE\u30AD\u30FC\u3067\u3082\u5373\u6C7A\uFF09")), q.type === "multi" && /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
       style: {
         display: "flex",
         flexDirection: "column",
         gap: 9
       }
-    }, q.choices.map(c => {
+    }, q.choices.map((c, i) => {
       const on = multiSel.includes(c.label);
       return /*#__PURE__*/React.createElement("button", {
         key: c.label,
         className: "choice",
+        onMouseDown: e => e.preventDefault(),
+        onMouseEnter: () => setCursor(i),
         onClick: () => setMultiSel(s => on ? s.filter(x => x !== c.label) : [...s, c.label]),
-        style: choiceRow(on ? "#2a3f6e" : "#1b2330", on ? "#5b9bff" : "#2a3543")
+        style: {
+          ...choiceRow(on ? "#2a3f6e" : "#1b2330", on ? "#5b9bff" : "#2a3543"),
+          ...(i === cursor ? {
+            boxShadow: "inset 0 0 0 2px #8ef0cf"
+          } : {})
+        }
       }, /*#__PURE__*/React.createElement("span", {
         style: {
           fontSize: 16,
@@ -10602,15 +10789,27 @@ function App() {
         }
       }, c.text));
     })), /*#__PURE__*/React.createElement("button", {
+      onMouseDown: e => e.preventDefault(),
+      onMouseEnter: () => setCursor(q.choices.length),
       onClick: () => multiSel.length && submitAnswer(multiSel),
       disabled: !multiSel.length,
       style: {
         ...primaryBtn("linear-gradient(90deg,#5b9bff,#34d39e)"),
         width: "100%",
         marginTop: 10,
-        opacity: multiSel.length ? 1 : 0.4
+        opacity: multiSel.length ? 1 : 0.4,
+        ...(cursor === q.choices.length ? {
+          boxShadow: "inset 0 0 0 2px #8ef0cf"
+        } : {})
       }
-    }, "\u6C7A\u5B9A\uFF08", multiSel.length, "/", q.selectCount, "\uFF09")), q.type === "fill" && /*#__PURE__*/React.createElement("div", {
+    }, "\u6C7A\u5B9A\uFF08", multiSel.length, "/", q.selectCount, "\uFF09"), /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 11,
+        opacity: 0.4,
+        marginTop: 6,
+        textAlign: "center"
+      }
+    }, "\u2191\u2193\u3067\u79FB\u52D5\u30FBEnter\u3067\u9078\u629E\uFF0F\u6C7A\u5B9A\u30DC\u30BF\u30F3\u307E\u3067\u52D5\u304B\u3057\u3066Enter\u3067\u56DE\u7B54")), q.type === "fill" && /*#__PURE__*/React.createElement("div", {
       style: {
         display: "flex",
         gap: 8
@@ -10909,6 +11108,72 @@ function App() {
         onClick: startReview,
         style: primaryBtn("linear-gradient(90deg,#5b9bff,#34d39e)")
       }, "\u3082\u3046\u4E00\u5EA6 \u9593\u9055\u3048\u305F\u554F\u984C\u306B\u6311\u6226"), /*#__PURE__*/React.createElement("button", {
+        onClick: () => setScreen("home"),
+        style: ghostBtn
+      }, "\u30DB\u30FC\u30E0\u3078"))));
+    }
+    if (s.flagged) {
+      // 要復習フラグの挑戦結果（フラグは正解しても外れない＝残り数はflaggedListそのもの）
+      const remain = flaggedList.length;
+      return /*#__PURE__*/React.createElement("div", {
+        style: wrap
+      }, styleTag, /*#__PURE__*/React.createElement("div", {
+        style: {
+          maxWidth: 460,
+          width: "100%",
+          textAlign: "center",
+          paddingTop: 34
+        }
+      }, /*#__PURE__*/React.createElement("div", {
+        style: {
+          fontSize: 13,
+          letterSpacing: 3,
+          opacity: 0.6
+        }
+      }, "\uD83D\uDD16 \u8981\u5FA9\u7FD2\u306E\u7D50\u679C"), /*#__PURE__*/React.createElement("div", {
+        style: {
+          fontSize: 60,
+          fontWeight: 900,
+          lineHeight: 1.1,
+          margin: "10px 0 0",
+          color: "#34d39e"
+        }
+      }, s.correct, /*#__PURE__*/React.createElement("span", {
+        style: {
+          fontSize: 22,
+          opacity: 0.7
+        }
+      }, " / ", s.total)), /*#__PURE__*/React.createElement("div", {
+        style: {
+          fontSize: 14,
+          opacity: 0.6,
+          marginTop: 2
+        }
+      }, "\u6B63\u89E3"), /*#__PURE__*/React.createElement("div", {
+        style: {
+          fontSize: 14,
+          marginTop: 18,
+          lineHeight: 1.7,
+          color: remain === 0 ? "#34d39e" : "#c2cad8"
+        }
+      }, remain === 0 ? "🎉 要復習が0問に！" : `要復習に残っている問題 ${remain}問`), /*#__PURE__*/React.createElement("div", {
+        style: {
+          fontSize: 11.5,
+          opacity: 0.5,
+          marginTop: 6,
+          lineHeight: 1.7
+        }
+      }, "\u6B63\u89E3\u3057\u3066\u3082\uD83D\uDD16\u306F\u81EA\u52D5\u3067\u5916\u308C\u307E\u305B\u3093\u3002\u89E3\u8AAC\u753B\u9762\u306E\uD83D\uDD16\u30DC\u30BF\u30F3\u3067\u624B\u52D5\u3067\u5916\u3057\u3066\u304F\u3060\u3055\u3044\u3002"), /*#__PURE__*/React.createElement("div", {
+        style: {
+          display: "flex",
+          flexDirection: "column",
+          gap: 10,
+          marginTop: 26
+        }
+      }, remain > 0 && /*#__PURE__*/React.createElement("button", {
+        onClick: startFlagged,
+        style: primaryBtn("linear-gradient(90deg,#e0a830,#f6c247)")
+      }, "\u3082\u3046\u4E00\u5EA6 \u8981\u5FA9\u7FD2\u306B\u6311\u6226"), /*#__PURE__*/React.createElement("button", {
         onClick: () => setScreen("home"),
         style: ghostBtn
       }, "\u30DB\u30FC\u30E0\u3078"))));
