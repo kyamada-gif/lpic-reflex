@@ -9056,6 +9056,10 @@ function App() {
     setFullBlock(false);
     beginRun(queue, "exam");
   }
+  // 総合テストの間違えた問題を、正解するまで繰り返す覚えるモードで再出題（結果はまた exammiss 扱いなので連鎖する）。
+  function startExamMisses(missed) {
+    if (missed && missed.length) beginRun(shuffle(missed), "exammiss");
+  }
   function submitAnswer(input) {
     const q = testQueue[testPos];
     if (!q || phase !== "answer") return;
@@ -9087,6 +9091,8 @@ function App() {
     setLastOk(null);
     setRetry(true);
   }
+  // 「正解するまで繰り返す」覚えるモード挙動を使うモード（暗記10問／ランダム演習／総合テストの覚え直し）。
+  const isCram = m => m === "study" || m === "random" || m === "exammiss";
   function nextTest() {
     const next = testPos + 1;
     if (next >= testQueue.length) {
@@ -9137,6 +9143,9 @@ function App() {
             return slots;
           });
         }
+        // 総合テストで間違えた問題を lastScore に持たせ、「間違えた問題を覚える」導線に使う。
+        const examMissedIds = new Set(testResults.filter(r => !r.ok).map(r => r.id));
+        const examMissed = testQueue.filter(q => examMissedIds.has(q.id));
         setLastScore({
           correct,
           total,
@@ -9144,7 +9153,21 @@ function App() {
           exam: true,
           pass,
           gold,
-          tier: pass ? tier : null
+          tier: pass ? tier : null,
+          missed: examMissed
+        });
+        setScreen("result");
+      } else if (testMode === "exammiss") {
+        // 総合テストの覚え直し: 正解するまで繰り返した後、まだ残るミスを返す
+        const missedIds = new Set(testResults.filter(r => !r.ok).map(r => r.id));
+        const missed = testQueue.filter(q => missedIds.has(q.id));
+        setLastScore({
+          correct,
+          total,
+          pct,
+          badge: false,
+          exammiss: true,
+          missed
         });
         setScreen("result");
       } else if (testMode === "review") {
@@ -9214,8 +9237,8 @@ function App() {
       if (phase === "reveal") {
         if (e.key === "Enter" || e.key === " ") {
           e.preventDefault();
-          // 暗記10問テストで不正解なら Enter はやり直し（次へは出さない）。それ以外は次へ。
-          if (testMode === "study" && !lastOk) retryQuestion();else nextTest();
+          // 覚えるモード系（暗記10問／ランダム演習／総合の覚え直し）で不正解なら Enter はやり直し（次へは出さない）。それ以外は次へ。
+          if (isCram(testMode) && !lastOk) retryQuestion();else nextTest();
         }
         return;
       }
@@ -9967,7 +9990,77 @@ function App() {
           whiteSpace: "nowrap"
         }
       }, "\uD83C\uDFB2 ", Math.min(RANDOM_BLOCK_N, sec.length), "\u554F"));
+    })), /*#__PURE__*/React.createElement("div", {
+      style: {
+        display: "flex",
+        alignItems: "center",
+        gap: 10,
+        margin: "18px 0 10px"
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        flex: 1,
+        height: 1,
+        background: "#232d3b"
+      }
+    }), /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontSize: 11,
+        fontWeight: 800,
+        letterSpacing: 1.5,
+        color: "#5b7088",
+        whiteSpace: "nowrap"
+      }
+    }, "\u307E\u305F\u306F"), /*#__PURE__*/React.createElement("div", {
+      style: {
+        flex: 1,
+        height: 1,
+        background: "#232d3b"
+      }
     })), /*#__PURE__*/React.createElement("button", {
+      onClick: () => startRandom(-1, RANDOM_BLOCK_N),
+      className: "secbtn",
+      style: {
+        display: "flex",
+        alignItems: "center",
+        gap: 12,
+        padding: "15px 16px",
+        borderRadius: 12,
+        cursor: "pointer",
+        background: "linear-gradient(180deg,#27406b,#1d3052)",
+        border: "1px solid #3f6aa8",
+        color: "#eceff4",
+        textAlign: "left",
+        width: "100%"
+      }
+    }, /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontSize: 22
+      }
+    }, "\uD83C\uDF10"), /*#__PURE__*/React.createElement("span", {
+      style: {
+        flex: 1,
+        minWidth: 0
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 14.5,
+        fontWeight: 900
+      }
+    }, "\u5168\u4F53\u304B\u3089\u30E9\u30F3\u30C0\u30E0"), /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 11.5,
+        opacity: 0.75,
+        marginTop: 1
+      }
+    }, "\u5168\u30D6\u30ED\u30C3\u30AF\u6A2A\u65AD\u30FB\u3044\u3061\u3070\u3093\u306E\u5FA9\u7FD2")), /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontSize: 11.5,
+        fontWeight: 800,
+        color: "#f6c247",
+        whiteSpace: "nowrap"
+      }
+    }, "\uD83C\uDFB2 ", RANDOM_BLOCK_N, "\u554F")), /*#__PURE__*/React.createElement("button", {
       onClick: () => setScreen("home"),
       style: {
         ...linkBtn,
@@ -10324,7 +10417,8 @@ function App() {
     const isReview = testMode === "review";
     const isRandom = testMode === "random";
     const isExam = testMode === "exam";
-    const runTitle = isSection ? `${sectionLabels[secIdx]} テスト` : isExam ? "🎯 総合テスト（模試）" : isReview ? "🔁 間違えた問題に挑戦" : isRandom ? `🎲 ${randomLabel} ランダム` : `第${studyChunk + 1}セット チェック`;
+    const isExamMiss = testMode === "exammiss";
+    const runTitle = isSection ? `${sectionLabels[secIdx]} テスト` : isExam ? "🎯 総合テスト（模試）" : isExamMiss ? "🔁 総合テストの覚え直し" : isReview ? "🔁 間違えた問題に挑戦" : isRandom ? `🎲 ${randomLabel} ランダム` : `第${studyChunk + 1}セット チェック`;
     return /*#__PURE__*/React.createElement("div", {
       style: wrap
     }, styleTag, /*#__PURE__*/React.createElement("div", {
@@ -10345,7 +10439,7 @@ function App() {
       }
     }, /*#__PURE__*/React.createElement("button", {
       onClick: () => {
-        if (isRandom) openBlockRandom();else if (isSection || isReview || isExam) setScreen("home");else {
+        if (isRandom) openBlockRandom();else if (isSection || isReview || isExam || isExamMiss) setScreen("home");else {
           setStudySub("learn");
           setScreen("study");
         }
@@ -10602,9 +10696,9 @@ function App() {
     }), /*#__PURE__*/React.createElement("button", {
       onClick: () => fillVal.trim() && submitAnswer(fillVal),
       style: primaryBtn("linear-gradient(90deg,#5b9bff,#34d39e)")
-    }, "\u6C7A\u5B9A"))) : testMode === "study" && !lastOk ?
+    }, "\u6C7A\u5B9A"))) : isCram(testMode) && !lastOk ?
     /*#__PURE__*/
-    /* 暗記10問テストで不正解のときは「次へ」を出さず、正解するまで「もう一度チャレンジ」だけ（採点は最初の不正解のまま）。学習動線の制御。 */
+    /* 覚えるモード系（暗記10問／ランダム演習／総合の覚え直し）で不正解のときは「次へ」を出さず、正解するまで「もう一度チャレンジ」だけ（採点は最初の不正解のまま）。学習動線の制御。 */
     React.createElement("button", {
       onClick: retryQuestion,
       style: {
@@ -10744,10 +10838,72 @@ function App() {
           gap: 10,
           marginTop: 24
         }
-      }, /*#__PURE__*/React.createElement("button", {
+      }, s.missed && s.missed.length > 0 && /*#__PURE__*/React.createElement("button", {
+        onClick: () => startExamMisses(s.missed),
+        style: primaryBtn("linear-gradient(90deg,#e0a830,#f6c247)")
+      }, "\uD83D\uDD01 \u9593\u9055\u3048\u305F\u554F\u984C\u3092\u899A\u3048\u308B\uFF08", s.missed.length, "\u554F\uFF09"), /*#__PURE__*/React.createElement("button", {
         onClick: startExam,
         style: primaryBtn("linear-gradient(90deg,#5ee0b4,#34d39e)")
       }, "\uD83C\uDFAF \u3082\u3046\u4E00\u5EA6 \u7DCF\u5408\u30C6\u30B9\u30C8"), /*#__PURE__*/React.createElement("button", {
+        onClick: () => setScreen("home"),
+        style: ghostBtn
+      }, "\u30DB\u30FC\u30E0\u3078"))));
+    }
+    if (s.exammiss) {
+      // 総合テストの覚え直し結果（正解するまで繰り返した後、まだ残るミス）
+      const remain = s.missed ? s.missed.length : 0;
+      return /*#__PURE__*/React.createElement("div", {
+        style: wrap
+      }, styleTag, /*#__PURE__*/React.createElement("div", {
+        style: {
+          maxWidth: 460,
+          width: "100%",
+          textAlign: "center",
+          paddingTop: 34
+        }
+      }, /*#__PURE__*/React.createElement("div", {
+        style: {
+          fontSize: 13,
+          letterSpacing: 3,
+          opacity: 0.6
+        }
+      }, "\uD83D\uDD01 \u899A\u3048\u76F4\u3057\u306E\u7D50\u679C"), /*#__PURE__*/React.createElement("div", {
+        style: {
+          fontSize: 60,
+          fontWeight: 900,
+          lineHeight: 1.1,
+          margin: "10px 0 0",
+          color: "#34d39e"
+        }
+      }, s.correct, /*#__PURE__*/React.createElement("span", {
+        style: {
+          fontSize: 22,
+          opacity: 0.7
+        }
+      }, " / ", s.total)), /*#__PURE__*/React.createElement("div", {
+        style: {
+          fontSize: 14,
+          opacity: 0.6,
+          marginTop: 2
+        }
+      }, "\u6B63\u89E3"), /*#__PURE__*/React.createElement("div", {
+        style: {
+          fontSize: 14,
+          marginTop: 18,
+          lineHeight: 1.7,
+          color: remain === 0 ? "#34d39e" : "#c2cad8"
+        }
+      }, remain === 0 ? "🎉 全部覚えた！" : `残り ${remain}問`), /*#__PURE__*/React.createElement("div", {
+        style: {
+          display: "flex",
+          flexDirection: "column",
+          gap: 10,
+          marginTop: 26
+        }
+      }, remain > 0 && /*#__PURE__*/React.createElement("button", {
+        onClick: () => startExamMisses(s.missed),
+        style: primaryBtn("linear-gradient(90deg,#e0a830,#f6c247)")
+      }, "\u3082\u3046\u4E00\u5EA6 \u9593\u9055\u3048\u305F\u554F\u984C\u3092\u899A\u3048\u308B"), /*#__PURE__*/React.createElement("button", {
         onClick: () => setScreen("home"),
         style: ghostBtn
       }, "\u30DB\u30FC\u30E0\u3078"))));
