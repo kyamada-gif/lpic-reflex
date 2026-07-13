@@ -10053,7 +10053,7 @@ function App() {
         opacity: 0.75,
         marginTop: 1
       }
-    }, "\u5168\u30D6\u30ED\u30C3\u30AF\u6A2A\u65AD\u30FB\u3044\u3061\u3070\u3093\u306E\u5FA9\u7FD2")), /*#__PURE__*/React.createElement("span", {
+    }, "\u5168\u30D6\u30ED\u30C3\u30AF\u6A2A\u65AD")), /*#__PURE__*/React.createElement("span", {
       style: {
         fontSize: 11.5,
         fontWeight: 800,
